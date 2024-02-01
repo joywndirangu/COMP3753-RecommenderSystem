@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <title>Welcome Page</title>
+        <link rel="stylesheet" href="welc.css">
+    </head> 
+
+
+    <body>
+
+        <div id = "head-banner">
+            <img src = "RSLogo.png" alt = "">
+        </div>
+
+        <div class="news-banner">
+            <div class="news-content">
+                <p>Time to break the bank! Mailbox payment deadlines are here! Pay by August 15.</p>
+            </div>
+        </div>
+        <section class = "links">
+            <article class = "services">
+                <span class = "service-icon"><i class="fa-solid fa-inbox"></i></span>
+                <a href = "your_mail.html" class = "btn"><h5>Your Mail</h5></a>
+            </article>
+            <article class = "services">
+                <span class = "service-icon"><i class="fa-solid fa-handshake-angle"></i></span>
+                <a href = "https://www.acadiastudents.ca/asu-services-sub" class = "btn"><h5>Other ASU Resources</h5></a>
+            </article>
+            <article class = "services">
+                <span class = "service-icon"><i class="fa-regular fa-circle-question"></i></span>
+                <a href = "contact_us.html" class = "btn"><h5>Contact Us</h5></a>
+            </article>
+            <article class = "services">
+                <span class = "service-icon"><i class="fa-regular fa-user"></i></span>
+                <a href="#" onclick="document.getElementById('id01').style.display='block'" class = "btn"><h5>Log In/Sign Up</h5></a>
+            </article>
+        </section>     
+            </div>
+
+        </div>
+        <footer>
+            <div class="footer">
+                <h4>PostGaurdian</h4>
+                <p>Made for Acadia Students by Acadia Students</p>
+            </div>
+            <div id = "copyright">
+                <p>Copyright &copy; 2023 HCI</p>
+            </div>
+        </footer>
+
+	<link rel="stylesheet" type="text/css" href="login.css">
+        <script src="login.js"></script>
+
+        <div id="id01" class="modal">
+
+            <div id="Login" class="tabcontent" style="display: block;">
+              <form class="modal-content animate" action="accounts.html" method="post">
+          
+                <div class="tab">
+                  <button class="tablinks active" onclick="openForm(event, 'Login')" style="background-color: #c41424; color: white;">Login</button>
+                  <button class="tablinks" onclick="openForm(event, 'Register')" style="background-color: #003366; color: white;">Register</button>
+                </div>
+          
+                <div class="container">
+                  <label for="email"><b>Student/Staff Email</b></label>
+                  <input type="text" placeholder="Enter Email" name="email" required>
+          
+                  <label for="psw"><b>Password</b></label>
+                  <input type="password" placeholder="Enter Password" name="psw" required>
+                    
+                  <button type="submit" style="background-color: #c41424;">Login</button>
+                  <label>
+                    <input type="checkbox" checked="checked" name="remember"> Remember me
+                  </label>
+                </div>
+          
+                <div class="container" style="background-color:#f1f1f1">
+                  <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn" style="background-color: #c41424;">Cancel</button>
+                  <span class="psw"><a href="#">Forgot password?</a></span>
+                </div>
+              </form>
+            </div>
+          
+            <div id="Register" class="tabcontent">
+              <form class="modal-content animate" action="accounts.html" method="post"> 
+                <div class="tab">
+                  <button class="tablinks" onclick="openForm(event, 'Login')" style="background-color: #c41424; color: white;">Login</button>
+                  <button class="tablinks active" onclick="openForm(event, 'Register')" style="background-color: #003366; color: white;">Register</button>
+                </div>
+          
+                <div class="container">
+                  <label for="fname"><b>First Name</b></label>
+                  <input type="text" placeholder="Enter First Name" name="fname" required>
+
+                  <label for="fname"><b>Last Name</b></label>
+                  <input type="text" placeholder="Enter Last Name" name="lname" required>
+          
+                  <label for="email"><b>Student Email</b></label>
+                  <input type="text" placeholder="Enter Email" name="email" required>
+          
+                  <label for="psw"><b>Password</b></label>
+                  <input type="password" placeholder="Enter Password" name="psw" required>
+          
+                  <label for="psw-confirm"><b>Confirm Password</b></label>
+                  <input type="password" placeholder="Confirm Password" name="psw-confirm" required>
+                    
+                  <button type="submit" style="background-color: #003366;">Register</button>
+                  <label>
+                    <input type="checkbox" name="terms"> I Agree to <a href="#">Terms and Conditions</a>
+                  </label>
+                </div>
+          
+                <div class="container" style="background-color:#f1f1f1">
+                  <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn" style="background-color: #003366;">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+    </body>
+</html>

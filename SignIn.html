@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign In</title>
+        <link rel="stylesheet" href="sign.css">
+    </head>
+    <body>
+        <header>
+                <img src="MiniHeader.png" alt="AcadiaPG">
+        </header>
+       
+        <div class="navbar">
+            <p></p>
+        </div>
+
+        <!-- <div class="news-banner">
+            <div class="news-content">
+                <p>Time to break the bank! Mailbox payment deadlines are here! Pay by August 15.</p>
+            </div>
+        </div> -->
+
+        <!-- Do not submit anything yet!
+        Still under another team member's email -->
+        <main>
+            <h1>WELCOME!</h1>
+            <div class="container1">
+                <div class="container2">
+                <form action = "https://formspree.io/f/mnqkrnwk" method = "POST" class = "contact-form">
+                    <div class="form-name">
+                        <input type="text" name="fname" placeholder="Your first name" required>
+                    </div>
+                    <input type="text" id="email" name="email" placeholder="Your Acadia email" required>
+                    <textarea id="message" name="message" placeholder="Write something.." style="height:200px" required></textarea>
+                    <button type = "submit" class = "btn">Submit</button>
+                </form>
+                </div>
+            </div>
+        </main>
+
+        <link rel="stylesheet" type="text/css" href="login.css">
+        <script src="login.js"></script>
+
+        <script>
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "250px";
+                document.getElementById("main").style.marginLeft = "250px";
+            }
+        
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("main").style.marginLeft= "0";
+            }
+        </script>
+    </body>
+</html>

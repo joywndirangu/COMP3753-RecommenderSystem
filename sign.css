@@ -1,0 +1,296 @@
+body {
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: Trebuchet MS;
+    background-image: url('map.jpeg'); /* Replace 'your-background-image.jpg' with the actual path to your image */
+    background-size: cover; /* This property ensures that the background image covers the entire container */
+    background-position: center; /* This property centers the background image */
+    background-attachment: fixed; /* This property fixes the background image while scrolling */
+}
+
+h1 {
+    color: #03989e;
+}
+
+/* header/logo Title */
+header {
+    background-color: #ffffff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* footer */
+footer {
+    padding: 20px;
+    text-align: center;
+    background: #03989e;
+    color: #fff;
+    text-align: center;
+}
+
+img{
+    width: 100%;
+    height: auto;
+    text-align: center;
+}
+
+/* navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: #03989e;
+}
+
+/* navigation bar links */
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 10px 16px;
+    text-decoration: none;
+}
+
+/* the right-aligned link */
+.navbar a.right {
+    float: right;
+}
+
+.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.resource-locator img {
+    max-width: 100%;
+    height: auto;
+}
+
+.resource-locator p {
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .menu {
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+    }
+
+    .menu.active {
+        display: flex;
+    }
+
+    .navigation li {
+        display: block;
+        margin: 10px 0;
+    }
+}
+
+.news-banner {
+    background-color: #003366;
+    color: #fff;
+    height: 40px;
+    overflow: hidden;
+}
+
+.news-content {
+    white-space: nowrap;
+    animation: news-slide 10s linear infinite;
+}
+
+@keyframes news-slide {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.your-mail-left {
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: left;
+}
+.your-mail-right {
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: left;
+}
+
+/*to make sure the images act accordingly to the left and right alignment of image*/
+.your-mail-left img {
+    max-width: 50%;
+    height: auto;
+}
+.your-mail-right img {
+    max-width: 50%;
+    height: auto;
+}
+
+.your-mail-info {
+    flex: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.contact-banner {
+    background-color: #003366;
+    color: #fff;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+}
+
+.contact-content {
+    max-width: 500;
+    margin: 0 auto;
+}
+
+.contact-banner h2 {
+    font-size: 24px;
+}
+
+.contact-banner p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.contact-content a {
+    display: inline-block;
+    background-color: #03989e;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.contact-content a:hover {
+    background-color: #95f7fa;
+}
+
+
+
+/* css for the contact us page form */
+* {box-sizing: border-box;}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #000000;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #95f7fa;
+}
+
+.container1 {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+.container2 {
+    border-radius: 2px;
+    border-color: #03989e;
+    border-style: solid;
+    border-width: 1px;
+    background-color: #ffffff;
+    padding: 20px;
+}
+
+/* mailbox css style */
+#mailbox-image-container {
+    width: 1134px;
+    height: 1604px;
+    overflow: hidden;
+    position: relative;
+}
+
+#mailbox-image {
+    width: 100%;
+}
+
+.highlight {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+button {
+    background-color: #03989e;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+}
+
+/* Sidebar Details */
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #767575;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #adfff3;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+#open-btn {
+    float: left;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px 8px 1px 22px;
+    margin-right: 10px;
+    color: white;
+}
