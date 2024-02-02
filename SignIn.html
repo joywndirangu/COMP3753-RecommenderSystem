@@ -1,4 +1,4 @@
-<!-- With help of W3Schools -->
+<!-- Forms with help of W3Schools -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -7,7 +7,7 @@
         <title>Sign In</title>
         <link rel="stylesheet" href="sign.css">
     </head>
-    <body>
+    <signinbody>
         <header>
                 <img src="MiniHeader.png" alt="AcadiaPG">
         </header>
@@ -16,22 +16,14 @@
             <p></p>
         </div>
 
-        <!-- <div class="news-banner">
-            <div class="news-content">
-                <p>Time to break the bank! Mailbox payment deadlines are here! Pay by August 15.</p>
-            </div>
-        </div> -->
-
-        <!-- Do not submit anything yet!
-        Still under another team member's email -->
         <main>
             <h1>WELCOME!</h1>
             <div class="container1">
                 <div class="container2">
-                    <form action="/action_page.php">
+                    <form id="signin">
                         <div class="container">
-                          <h1>Register</h1>
-                          <p>Please fill in this form to create an account.</p>
+                          <h1>Sign In</h1>
+                          <p>Please fill in this form to sign into your account.</p>
                           <hr>
                       
                           <label for="email"><b>Email</b></label>
@@ -39,36 +31,58 @@
                       
                           <label for="psw"><b>Password</b></label>
                           <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
-                      
-                          <label for="psw-repeat"><b>Repeat Password</b></label>
-                          <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
                           <hr>
-                          <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
                       
-                          <button type="submit" class="registerbtn">Register</button>
+                          <button type="submit" class="registerbtn">Sign In</button>
                         </div>
-                        
+
                         <div class="container signin">
-                          <p>Already have an account? <a href="#">Sign in</a>.</p>
+                            <p>Don't have an account with us? <a href="#" id="registerlink">Register</a>.</p>
                         </div>
-                      </form>
+                    </form>
+                    <form id="register" class="register">
+                        <div class="container">
+                            <h1>Register</h1>
+                            <p>Please fill in this form to create an account.</p>
+                            <hr>
+                        
+                            <label for="email"><b>Email</b></label>
+                            <input type="text" placeholder="Enter Email" name="email" id="email" required>
+                        
+                            <label for="psw"><b>Password</b></label>
+                            <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                        
+                            <label for="psw-repeat"><b>Repeat Password</b></label>
+                            <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
+                            <hr>
+                            <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+                        
+                            <button type="submit" class="registerbtn">Register</button>
+                          </div>
+                          
+                          <div class="container signin">
+                            <p>Already have an account? <a href="#" id="signinlink">Sign in</a>.</p>
+                          </div>
+                    </form>
                 </div>
             </div>
         </main>
-
-        <link rel="stylesheet" type="text/css" href="login.css">
-        <script src="login.js"></script>
-
         <script>
-            function openNav() {
-                document.getElementById("mySidenav").style.width = "250px";
-                document.getElementById("main").style.marginLeft = "250px";
+            // Below done with help from stackoverflow
+            function toggleForms(showForm, hideForm) {
+                document.getElementById(showForm).style.display = 'block';
+                document.getElementById(hideForm).style.display = 'none';
             }
+
+            document.getElementById('signinlink').addEventListener('click', function(event) {
+                event.preventDefault();
+                toggleForms('signin', 'register');
+            });
         
-            function closeNav() {
-                document.getElementById("mySidenav").style.width = "0";
-                document.getElementById("main").style.marginLeft= "0";
-            }
+            document.getElementById('registerlink').addEventListener('click', function(event) {
+                event.preventDefault();
+                toggleForms('register', 'signin');
+            });
         </script>
-    </body>
+    </signinbody>
 </html>

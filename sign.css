@@ -106,3 +106,13 @@ img{
     background-color: #f1f1f1;
     text-align: center;
   }
+
+  .register {
+    display: none;
+}
+
+/* navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: #03989e;
+}
