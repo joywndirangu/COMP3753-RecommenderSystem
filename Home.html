@@ -42,6 +42,7 @@
             </div>
 
         </div>
+        <div id="map"></div>
         <footer>
             <div class="footer">
                 <h4>MedLocator</h4>
@@ -53,6 +54,17 @@
 
 	<link rel="stylesheet" type="text/css" href="login.css">
         <script src="login.js"></script>
+        <!--Map JavaScript-->
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&callback=initMap" async defer></script>
+        <script>
+          function initMap() {
+              var map = new google.maps.Map(document.getElementById("map"), {
+                  center: { lat: -34.397, lng: 150.644 },
+                  zoom: 8
+              });
+              
+          }
+      </script>
 
         <div id="id01" class="modal">
 
