@@ -3,104 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Google Map</title>
+    <title>Hospital Locator</title>
     <!-- styles for map container -->
     <style>
         #map {
-            height: 400px;
+            height: 600px;
             width: 100%;
         }
         #search-box {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-        }
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    }
     </style>
 </head>
 <body>
-    <!--  a search box for searching within map bounds -->
-    <input id="search-box" type="text" placeholder="Search within map bounds">
+    <!-- Add a search box for searching within hospital zones -->
+    <input id="search-box" type="text" placeholder="Search hospital in zones like Western, South Zone, etc.">
 
-    <!--  a div to hold the map -->
+    <!-- Add a div to hold the map -->
     <div id="map"></div>
 
-    <!-- Google Maps JavaScript API script -->
+    <!-- Google Maps JavaScript API script with API key -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&libraries=places&callback=initMap" async defer></script>
 
     <!-- JavaScript to initialize the map and search box -->
-    <script>
-        // Initialize the map
-        function initMap() {
-            // Set the coordinates for the center of the map
-            var center = { lat: -34.397, lng: 150.644 };
-            // Create a new map object
-            var map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 8, // Set initial zoom level
-                center: center // Set initial center coordinates
+<script>
+    var map;
+    var markers = [];
+
+    // Initialize the map
+    function initMap() {
+        // Set the center of the map to a default location (e.g., a location within Western zone)
+        var defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco, CA as an example
+
+        // Create a new map object
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: defaultLocation,
+            zoom: 12 // Set initial zoom level
+        });
+
+        // Crea search box and link it to the UI element
+        var input = document.getElementById("search-box");
+        var searchBox = new google.maps.places.SearchBox(input);
+
+        // Bias the search results to the current map's viewport
+        map.addListener("bounds_changed", function() {
+            searchBox.setBounds(map.getBounds());
+        });
+
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener("places_changed", function() {
+            var places = searchBox.getPlaces();
+
+            if (places.length == 0) {
+                return;
+            }
+
+            // Clear out the old markers.
+            markers.forEach(function(marker) {
+                marker.setMap(null);
             });
+            markers = [];
 
-            // Create a search box and link it to the UI element
-            var input = document.getElementById("search-box");
-            var searchBox = new google.maps.places.SearchBox(input);
-
-            // Bias the search results to the current map's viewport
-            map.addListener("bounds_changed", function() {
-                searchBox.setBounds(map.getBounds());
-            });
-
-            // Listen for the event fired when the user selects a prediction and retrieve
-            // more details for that place.
-            searchBox.addListener("places_changed", function() {
-                var places = searchBox.getPlaces();
-
-                if (places.length == 0) {
+            // For each place, get the icon, name and location.
+            var bounds = new google.maps.LatLngBounds();
+            places.forEach(function(place) {
+                if (!place.geometry) {
+                    console.log("Returned place contains no geometry");
                     return;
                 }
 
-                // Clear out the old markers.
-                markers.forEach(function(marker) {
-                    marker.setMap(null);
-                });
-                markers = [];
+                // Create a marker for the hospital.
+                markers.push(new google.maps.Marker({
+                    map: map,
+                    title: place.name,
+                    position: place.geometry.location
+                }));
 
-                // For each place, get the icon, name and location.
-                var bounds = new google.maps.LatLngBounds();
-                places.forEach(function(place) {
-                    if (!place.geometry) {
-                        console.log("Returned place contains no geometry");
-                        return;
-                    }
-                    var icon = {
-                        url: place.icon,
-                        size: new google.maps.Size(71, 71),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(17, 34),
-                        scaledSize: new google.maps.Size(25, 25)
-                    };
-
-                    // Create a marker for each place.
-                    markers.push(new google.maps.Marker({
-                        map: map,
-                        icon: icon,
-                        title: place.name,
-                        position: place.geometry.location
-                    }));
-
-                    if (place.geometry.viewport) {
-                        // Only geocodes have viewport.
-                        bounds.union(place.geometry.viewport);
-                    } else {
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                map.fitBounds(bounds);
+                if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
             });
-        }
-    </script>
+            map.fitBounds(bounds);
+        });
+    }
+</script>
 </body>
 </html>
+
