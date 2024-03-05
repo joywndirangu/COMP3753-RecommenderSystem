@@ -53,56 +53,83 @@
 
 	<link rel="stylesheet" type="text/css" href="login.css">
         <script src="login.js"></script>
-
-	    <div class="map-container">
-    		<div id="map"></div>
-		</div>
-
+	<!-- Map Intgration -->
 	    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&callback=initMap" async defer></script>
-		<script>
-    		function initMap() {
-        	var map = new google.maps.Map(document.getElementById("map"), {
-		            center: { lat: -34.397, lng: 150.644 },
-		            zoom: 8,
-		            styles: [
-		                {
-		                    "elementType": "geometry",
-		                    "stylers": [
-		                        {
-		                            "color": "#ebe3cd"
-		                        }
-		                    ]
-		                },
-		                {
-		                    "elementType": "labels.text.fill",
-		                    "stylers": [
-		                        {
-		                            "color": "#523735"
-		                        }
-		                    ]
-		                },
-		                {
-		                    "elementType": "labels.text.stroke",
-		                    "stylers": [
-		                        {
-		                            "color": "#f5f1e6"
-		                        }
-		                    ]
-		                },
-		                {
-		                    "featureType": "administrative",
-		                    "elementType": "geometry.stroke",
-		                    "stylers": [
-		                        {
-		                            "color": "#c9b2a6"
-		                        }
-		                    ]
-		                },
-		            ]
-		        });
-		    }
-		</script>
+		<input id="search-box" type="text" placeholder="Search within map bounds">
 
+    <!-- Add a div to hold the map -->
+    <div id="map"></div>
+    <!-- JavaScript to initialize the map and search box -->
+    <script>
+        // Initialize the map
+        function initMap() {
+            // Set the coordinates for the center of the map
+            var center = { lat: -34.397, lng: 150.644 };
+            // Create a new map object
+            var map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 8, // Set initial zoom level
+                center: center // Set initial center coordinates
+            });
+
+            // Create a search box and link it to the UI element
+            var input = document.getElementById("search-box");
+            var searchBox = new google.maps.places.SearchBox(input);
+
+            // Bias the search results to the current map's viewport
+            map.addListener("bounds_changed", function() {
+                searchBox.setBounds(map.getBounds());
+            });
+
+            // Listen for the event fired when the user selects a prediction and retrieve
+            // more details for that place.
+            searchBox.addListener("places_changed", function() {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+
+                // Clear out the old markers.
+                markers.forEach(function(marker) {
+                    marker.setMap(null);
+                });
+                markers = [];
+
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place) {
+                    if (!place.geometry) {
+                        console.log("Returned place contains no geometry");
+                        return;
+                    }
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    };
+
+                    // Create a marker for each place.
+                    markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: icon,
+                        title: place.name,
+                        position: place.geometry.location
+                    }));
+
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
+        }
+    </script>
+    		
         <div id="id01" class="modal">
 
             <div id="Login" class="tabcontent" style="display: block;">
