@@ -4,87 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Locator</title>
-    <!-- styles for map container -->
+    <!-- styles for map container and search box -->
     <style>
         #map {
             height: 600px;
             width: 100%;
+            position: relative;
         }
+
         #search-box {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-    }
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            width: 400px; 
+            max-width: calc(100% - 20px);
+        }
     </style>
 </head>
 <body>
-    <input id="search-box" type="text" placeholder="Search hospital in zones like Western, South Zone, etc.">
+    
+    <input id="search-box" type="text" placeholder="Search hospitals for specific treatments">
 
     <div id="map"></div>
 
+    <!--Google Maps JavaScript API script with the provided API key -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&libraries=places&callback=initMap" async defer></script>
 
     <!-- JavaScript to initialize the map and search box -->
-<script>
-    var map;
-    var markers = [];
+    <script>
+        var map;
+        var markers = [];
 
-    function initMap() {
-        var defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco, CA as an example
+        function initMap() {
+            // Try HTML5 geolocation to get the user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
 
-        map = new google.maps.Map(document.getElementById("map"), {
-            center: defaultLocation,
-            zoom: 12
-        });
+                    // Create a new map object centered at the user's location
+                    map = new google.maps.Map(document.getElementById("map"), {
+                        center: userLocation,
+                        zoom: 12 
+                    });
 
-        var input = document.getElementById("search-box");
-        var searchBox = new google.maps.places.SearchBox(input);
+                    // Create a search box and link it to the UI element
+                    var input = document.getElementById("search-box");
+                    var searchBox = new google.maps.places.SearchBox(input);
 
-        map.addListener("bounds_changed", function() {
-            searchBox.setBounds(map.getBounds());
-        });
+                    // Bias the search results to the current map's viewport
+                    map.addListener("bounds_changed", function() {
+                        searchBox.setBounds(map.getBounds());
+                    });
 
-        searchBox.addListener("places_changed", function() {
-            var places = searchBox.getPlaces();
+                    // Listen for the event fired when the user selects a prediction and retrieve
+                    // more details for that place.
+                    searchBox.addListener("places_changed", function() {
+                        var places = searchBox.getPlaces();
 
-            if (places.length == 0) {
-                return;
+                        if (places.length == 0) {
+                            return;
+                        }
+
+                        // Clear out the old markers.
+                        markers.forEach(function(marker) {
+                            marker.setMap(null);
+                        });
+                        markers = [];
+
+                        // For each place, get the icon, name and location.
+                        var bounds = new google.maps.LatLngBounds();
+                        places.forEach(function(place) {
+                            if (!place.geometry) {
+                                console.log("Returned place contains no geometry");
+                                return;
+                            }
+
+                            // Create a marker for the hospital.
+                            markers.push(new google.maps.Marker({
+                                map: map,
+                                title: place.name,
+                                position: place.geometry.location
+                            }));
+
+                            if (place.geometry.viewport) {
+                                // Only geocodes have viewport.
+                                bounds.union(place.geometry.viewport);
+                            } else {
+                                bounds.extend(place.geometry.location);
+                            }
+                        });
+                        map.fitBounds(bounds);
+                    });
+                }, function() {
+                    handleLocationError(true, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, map.getCenter());
             }
+        }
 
-            markers.forEach(function(marker) {
-                marker.setMap(null);
+        function handleLocationError(browserHasGeolocation, pos) {
+            alert(browserHasGeolocation ?
+                            'Error: The Geolocation service failed.' :
+                            'Error: Your browser doesn\'t support geolocation.');
+            var defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Set a default location (e.g., San Francisco, CA)
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLocation,
+                zoom: 12 // Set initial zoom level
             });
-            markers = [];
-
-            var bounds = new google.maps.LatLngBounds();
-            places.forEach(function(place) {
-                if (!place.geometry) {
-                    console.log("Returned place contains no geometry");
-                    return;
-                }
-
-                markers.push(new google.maps.Marker({
-                    map: map,
-                    title: place.name,
-                    position: place.geometry.location
-                }));
-
-                if (place.geometry.viewport) {
-                    bounds.union(place.geometry.viewport);
-                } else {
-                    bounds.extend(place.geometry.location);
-                }
-            });
-            map.fitBounds(bounds);
-        });
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
-
