@@ -250,6 +250,10 @@ def handle(con, form, sessions):
                 #fetch the user's patient entry
                 cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
                 patient = cursor.fetchone()
+
+                #detect an invalid date format
+                if not validDatetime(form['data'][2]):
+                    return 'failure: invalid datetime'
                 
                 #insert the appointment
                 cursor.execute(
@@ -809,3 +813,17 @@ def vacant(username, cursor):
         return False
     else: 
         return True
+    
+#define a datetime validator function
+def validDatetime(dateString):
+
+    #attempt to parse the string 
+    #using the desired format
+    try:
+        datetime.strptime(dateString, '%Y-%m-%d %H:%M:%S')
+        return True
+    
+    #if parsing fails, the 
+    #format does not match
+    except ValueError:
+        return False
