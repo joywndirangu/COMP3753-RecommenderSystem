@@ -627,7 +627,7 @@ def handle(con, form, sessions):
                 cursor = con.cursor()
             
                 #make the user deletion
-                cursor.execute('DELETE FROM users WHERE userID = %s' (user[0],))
+                cursor.execute('DELETE FROM users WHERE userID = %s', (user[0],))
                 
                 #close the cursor
                 cursor.close()
