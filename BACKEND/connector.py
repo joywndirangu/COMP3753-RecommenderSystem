@@ -128,7 +128,7 @@ def handle(con, form, sessions):
         
         #search for the user's table entry
         cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND password_hash = %s", 
+            "SELECT * FROM users WHERE email = %s AND password = %s", 
             (
                 form['data'][0], 
                 passwordHash
@@ -176,6 +176,14 @@ def handle(con, form, sessions):
         
             #hash the provided password
             passwordHash = hashlib.sha256(form['data'][1].encode()).hexdigest()
+
+            #check that the provided form
+            #date of birth is within the valid
+            #format (YYYY/MM/DD)
+            if not validDate(form['data'][3]):
+
+                #report invalid
+                return 'failure: invalid date of birth format'
         
             #create a cursor
             cursor = con.cursor()
@@ -825,5 +833,19 @@ def validDatetime(dateString):
     
     #if parsing fails, the 
     #format does not match
+    except ValueError:
+        return False
+    
+#define a date validator function
+def validDate(dateString):
+
+    #attempt to parse the date string 
+    #using the expected MySQL date format
+    try:
+        datetime.strptime(dateString, '%Y-%m-%d')
+        return True
+    
+    #parsing failed, the 
+    #format is incorrect
     except ValueError:
         return False

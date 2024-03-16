@@ -30,16 +30,10 @@ def main():
         
         #listen for incoming requests
         form = mon.recv()
-
-        #notify the admin of recieved requests
-        print('----------- qRequest recieved -----------')
         
         #handle the query forms with con
         #and respond using mon
-        mon.send(con.handle(con, form, sessions))
-        
-        #notify admin of successfully handled form
-        print('form handled')
+        mon.send(connector.handle(con, form, sessions))
             
         #print a dividing footer 
         #for the admin's ease of use
