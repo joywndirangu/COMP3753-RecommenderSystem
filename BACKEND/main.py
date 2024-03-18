@@ -27,17 +27,14 @@ def main():
     
     #start the main application loop
     while 1:
-        
+
         #listen for incoming requests
         form = mon.recv()
+        print(f'main: {form}')
         
         #handle the query forms with con
         #and respond using mon
         mon.send(connector.handle(con, form, sessions))
-            
-        #print a dividing footer 
-        #for the admin's ease of use
-        print('\n')
 
 #start the backend
 if __name__ == "__main__":

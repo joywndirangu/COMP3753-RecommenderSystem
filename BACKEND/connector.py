@@ -110,6 +110,9 @@ def init():
     
     #close the cursor
     cursor.close()
+
+    #make a commit
+    db.commit()
     
     #return the data base connection
     return db
@@ -151,7 +154,8 @@ def handle(con, form, sessions):
         else:
         
             #check if the user is already signed in
-            if authenticate(form, sessions, con) != None:
+            signee = authenticate(form, sessions, con)
+            if signee != None:
             
                 #report that the user is already signed in
                 return 'failure: user already signed in'
@@ -160,13 +164,14 @@ def handle(con, form, sessions):
             else: 
             
                 #package the userID and IP
-                session = createCookie(user)
+                cookie = createCookie(user)
             
                 #add the userID to the users list
-                sessions.append(session)
+                sessions.append(cookie['session'].value)
+                print(sessions)
                 
                 #return the session cookie
-                return session
+                return cookie
 
     #detect a creation form
     elif form['type'] == 'create':
@@ -225,6 +230,9 @@ def handle(con, form, sessions):
            
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
            
                 #report a success
                 return 'success: user created'
@@ -283,6 +291,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report a success
                 return 'success: created appointment'
@@ -327,6 +338,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report a success
                 return 'success: created feedback'
@@ -496,6 +510,9 @@ def handle(con, form, sessions):
                     
                     #close the cursor
                     cursor.close()
+
+                    #make a commit
+                    con.commit()
                     
                     #report the update
                     return 'success: updated user'
@@ -554,6 +571,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the update
                 return 'success: updated appointment'
@@ -599,6 +619,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the update
                 return 'success: feedback updated'
@@ -639,6 +662,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the deletion
                 return 'success: user deleted'
@@ -682,6 +708,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
    
                 #report the deletion
                 return 'success: appointment deleted'
@@ -722,6 +751,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the deletion
                 return 'success: feedback deleted'
@@ -743,7 +775,7 @@ def authenticate(form, sessions, con):
     #check that the form cookie 
     #represents a valid session
     if form['cookie'] in sessions:
-        
+
         #create a cursor
         cursor = con.cursor()
         
@@ -784,9 +816,8 @@ def createCookie(user):
     expiry = futureTime.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
     
     #define a session cookie
-    cookie['session'] = user[0]
+    cookie['session'] = str(user[0])
     cookie['session']['path'] = '/'
-    cookie['session']['expires'] = expiry
     cookie['session']['httponly'] = True
     
     #return the cookie

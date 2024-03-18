@@ -68,6 +68,7 @@ def makeHTTPRequestHandler(childConn):
             self.send_header('Access-Control-Allow-Origin', 'https://localhost:4443/')
             self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
             self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+            self.send_header('Access-Control-Allow-Credentials', 'true')
             self.end_headers()
 
         #define a do options function
@@ -84,6 +85,9 @@ def makeHTTPRequestHandler(childConn):
             #handle the POST request
             form = self.handlePost()
 
+            #print the headers
+            print(self.headers)
+
             #attempt to retrieve the 'Cookie' header from the request
             cookie_header = self.headers.get('Cookie')
             cookie_value = None
@@ -92,7 +96,7 @@ def makeHTTPRequestHandler(childConn):
             if cookie_header:
                 cookie = SimpleCookie(cookie_header)
                 if 'session' in cookie:
-                    cookie_value = cookie['exampleCookie'].value
+                    cookie_value = cookie['session'].value
 
             #set the form cookie
             form['cookie'] = cookie_value
@@ -124,6 +128,8 @@ def makeHTTPRequestHandler(childConn):
                 #send the JSON string to the client
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', 'https://localhost:4443/')
+                self.send_header('Access-Control-Allow-Credentials', 'true')
                 self.end_headers()
                 self.wfile.write(json_result.encode())
             
@@ -134,14 +140,16 @@ def makeHTTPRequestHandler(childConn):
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
 
+
                 #convert the SimpleCookie object to a 
                 #string and include it in the Set-Cookie header
                 for morsel in result.values():
                     self.send_header('Set-Cookie', morsel.OutputString())
+                    print('monitor: '+morsel.OutputString())
                 self.end_headers()
                 
                 #write any additional response body content if necessary
-                response_body = "cookie set successfully."
+                response_body = "success: cookie set successfully."
                 self.wfile.write(response_body.encode())
 
         #define a get handler function
