@@ -15,11 +15,9 @@ def init():
     
     #connect to mysql
     db = mysql.connector.connect(
-    
         host="localhost",
         user="root",
         password="mysql"
-       
     )
     
     #open a database cursor
@@ -31,81 +29,64 @@ def init():
     #switch the connection to the medlocator database
     cursor.execute('USE medlocator')
     
-    #create a location database should it not exist
-    cursor.execute("""CREATE TABLE IF NOT EXISTS locations(
-    
-        locationID INT AUTO_INCREMENT PRIMARY KEY,
-        address VARCHAR(64) NOT NULL,
-        latitude VARCHAR(64) NOT NULL,
-        longitude VARCHAR(64) NOT NULL
-    
-    )""")
-    
-    #create a clinics table should it not exist
+    #create a clinics database should it not exist
     cursor.execute("""CREATE TABLE IF NOT EXISTS clinics(
     
-        clinicID INT AUTO_INCREMENT PRIMARY KEY,
+        clinic_id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(64) NOT NULL,
-        locationID INT,
-        FOREIGN KEY (locationID) REFERENCES locations(locationID)
+        address VARCHAR(64) NOT NULL
+    
+    )""")
+    
+    #create a admins table should it not exist
+    cursor.execute("""CREATE TABLE IF NOT EXISTS admins(
+    
+        user_id INT AUTO_INCREMENT PRIMARY KEY,
+        clinic_id INT,
+        FOREIGN KEY (clinic_id) REFERENCES clinics(clinic_id),
+        role VARCHAR(64) NOT NULL,
+        name VARCHAR(64) NOT NULL, 
+        email VARCHAR(64) UNIQUE NOT NULL,
+        password VARCHAR(64) NOT NULL,
+        patients TEXT
         
     )""")
     
-    #create a user table should it not exist
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users(
-    
-        userID INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(64) NOT NULL UNIQUE,
-        password VARCHAR(64) NOT NULL 
-    
-    )""")
-    
-    #create a patient table should it not exist
+    #create a patients table should it not exist
     cursor.execute("""CREATE TABLE IF NOT EXISTS patients(
     
-        patientID INT AUTO_INCREMENT PRIMARY KEY,
-        userID INT,
-        FOREIGN KEY (userID) REFERENCES users(userID),
+        patient_id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(64) NOT NULL,
-        dateOfBirth DATE NOT NULL
+        sex VARCHAR(1) NOT NULL,
+        age INT NOT NULL,
+        emerg_contact VARCHAR(64) NOT NULL,
+        healthcard_no INT NOT NULL,
+        address VARCHAR(64) NOT NULL
     
     )""")
     
-    #create a medical history table should it not exist
-    cursor.execute("""CREATE TABLE IF NOT EXISTS medicalHistory(
-    recordID INT AUTO_INCREMENT PRIMARY KEY,
-        
-        patientID INT,
-        FOREIGN KEY (patientID) REFERENCES patients(patientID),
-        description TEXT NOT NULL,
-        date DATE NOT NULL 
+    #create a records table should it not exist
+    cursor.execute("""CREATE TABLE IF NOT EXISTS medical_records(
+    
+        record_id INT AUTO_INCREMENT PRIMARY KEY,
+        patient_id INT,
+        FOREIGN KEY (patient_id) REFERENCES patient (patient_id),
+        diagnoses TEXT,
+        med_hist TEXT,
+        medication TEXT
     
     )""")
     
-    #create an appointment table should it not exist
+    #create an appointments table should it not exist
     cursor.execute("""CREATE TABLE IF NOT EXISTS appointments(
 
-        appointmentID INT AUTO_INCREMENT PRIMARY KEY,
-        patientID INT,
-        FOREIGN KEY (patientID) REFERENCES patients(patientID),
-        clinicID INT,
-        FOREIGN KEY (clinicID) REFERENCES clinics(clinicID),
-        status VARCHAR(255) NOT NULL,  # Assuming VARCHAR(255), adjust as necessary
-        dateTime DATETIME NOT NULL
-        
-    )""")
+        appt_id INT AUTO_INCREMENT PRIMARY KEY,
+        patient_id INT,
+        FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+        appt_type VARCHAR(64) NOT NULL,
+        appt_status VARCHAR(64) NOT NULL,
+        appt_datetime DATETIME NOT NULL
     
-    #create a feedback table should it not exists
-    cursor.execute("""CREATE TABLE IF NOT EXISTS feedback(
-
-        feedbackID INT AUTO_INCREMENT PRIMARY KEY,
-        userID INT,
-        FOREIGN KEY (userID) REFERENCES users(userID),  # Added missing comma here
-        clinicID INT,
-        FOREIGN KEY (clinicID) REFERENCES clinics(clinicID),
-        rating INT NOT NULL,
-        comment TEXT NOT NULL
-        
     )""")
     
     #close the cursor
@@ -118,656 +99,470 @@ def init():
     return db
     
 #define a query form handler function
-def handle(con, form, sessions):
+def handle(form, sessions, con):
 
-    #detect a sign in form
-    if form['type'] == 'sign in':
-    
-        #hash the provided password
-        passwordHash = hashlib.sha256(form['data'][1].encode()).hexdigest()
-        
-        #create a cursor
-        cursor = con.cursor()
-        
-        #search for the user's table entry
-        cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND password = %s", 
-            (
-                form['data'][0], 
-                passwordHash
-            )
-        )
-        
-        #fetch the search results
-        user = cursor.fetchone()
-        
-        #close the cursor
-        cursor.close()
-        
-        #handle invalid credentials
-        if user == None:
-            
-            #report an invalid email password combo
-            return 'failure: invalid email/password'
-        
-        #perform the sign in routine
-        else:
-        
-            #check if the user is already signed in
-            signee = authenticate(form, sessions, con)
-            if signee != None:
-            
-                #report that the user is already signed in
-                return 'failure: user already signed in'
-            
-            #sign the user in 
-            else: 
-            
-                #package the userID and IP
-                cookie = createCookie(user)
-            
-                #add the userID to the users list
-                sessions.append(cookie['session'].value)
-                print(sessions)
+    #identify the form user
+    user = authenticate(form, sessions, con)
+
+    #if the user does not have an open
+    #session, allow them to create an 
+    #account or sign in
+    if user == None:
+
+        #detect a creation request
+        if form['type'] == 'create':
+
+            #detect a admin creation request
+            if form['act'] == 'user':
+
+                #try to hash the provided password
+                try: 
+                    form['data'][4] = hashlib.sha256(form['data'][4].encode()).hexdigest()
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@127 - password hashing failure'
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@126 - packaging failure'
                 
-                #return the session cookie
-                return cookie
+                #handle the recieved data
+                if data != None:
 
-    #detect a creation form
-    elif form['type'] == 'create':
-    
-        #detect an account creation act
-        if form['act'] == 'user':
-        
-            #hash the provided password
-            passwordHash = hashlib.sha256(form['data'][1].encode()).hexdigest()
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 6:
 
-            #check that the provided form
-            #date of birth is within the valid
-            #format (YYYY/MM/DD)
-            if not validDate(form['data'][3]):
-
-                #report invalid
-                return 'failure: invalid date of birth format'
-        
-            #create a cursor
-            cursor = con.cursor()
-
-            #check if the provided email
-            #is already in use
-            if vacant(form['data'][0], cursor):
-
-                #insert the new user
-                cursor.execute(
-                    'INSERT INTO users (email, password) VALUES (%s, %s)', 
-                    (
-                        #email
-                        form['data'][0], 
+                        #validate the clinic_id type
+                        if not isinstance(data[0], int):
+                            return 'Cfailure@142 - invalid clinic_id data type'
                         
-                        #password
-                        passwordHash
-                    )
-                )
-            
-                #fetch the user
-                cursor.execute('SELECT * FROM users WHERE email = %s', (form['data'][0],))
-                user = cursor.fetchone()
-            
-                #create a new patient entry
-                cursor.execute(
-                    'INSERT INTO patients (userID, name, dateOfBirth) VALUES (%s, %s, %s)', 
-                    (
-                        #userID
-                        user[0],
+                        #validate the role type
+                        if not isinstance(data[1], str) or len(data[1]) > 64:
+                            return 'Cfailure@146 - invalid role data type/length'
                         
-                        #name
-                        form['data'][2],
+                        #validate name type
+                        if not isinstance(data[2], str) or len(data[2]) > 64:
+                            return 'Cfailure@150 - invalid name data type/length'
+
+                        #validate email type
+                        if not isinstance(data[3], str) or len(data[3]) > 64:
+                            return 'Cfailure@154 - invalid email data type/length'
                         
-                        #dateOfBirth
-                        form['data'][3],
-                    )    
-                )
-           
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-           
-                #report a success
-                return 'success: user created'
-            
-            #detect invalid form data
-            else:
-
-                #report
-                return 'failure: username already taken'
-           
-        #detect an appointment creation request
-        elif form['act'] == 'appointment':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid form credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid form credentials'
-                
-            #begin the appointment 
-            #creation routine
-            else:
-            
-                #create a cursor
-                cursor = con.cursor()
-                
-                #fetch the user's patient entry
-                cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
-                patient = cursor.fetchone()
-
-                #detect an invalid date format
-                if not validDatetime(form['data'][2]):
-                    return 'failure: invalid datetime'
-                
-                #insert the appointment
-                cursor.execute(
-                    'INSERT INTO appointments (patientID, clinicID, status, dateTime) VALUES (%s, %s, %s, %s)',
-                    (
-                        #patientID
-                        patient[0],
+                        #validate password type
+                        if not isinstance(data[4], str) or len(data[4]) > 64:
+                            return 'Cfailure@158 - invalid password data type/length'
                         
-                        #clinicID
-                        form['data'][0],
-                        
-                        #status
-                        form['data'][1],
-                        
-                        #date time
-                        form['data'][2]
-                    )
-                )
+                        #validate patients type
+                        if not isinstance(data[5], str):
+                            return 'Cfailure@162 - invalid patients data type'
                 
-                #close the cursor
-                cursor.close()
+                        #create a cursor
+                        cursor = con.cursor()
 
-                #make a commit
-                con.commit()
-                
-                #report a success
-                return 'success: created appointment'
+                        #check if the provided email
+                        #is already in use
+                        if not vacant(data[3], cursor):
+                            return 'Cfailure@170 - provided email already in use'
+                        
+                        #insert the user
+                        cursor.execute("""(     
+                            INSERT INTO admins (
+                                clinic_id, 
+                                role, 
+                                name, 
+                                email, 
+                                password, 
+                                patients
+                                ) VALUES (%s, %s, %s, %s, %s, %s)
+                        )""", data)
 
-        #detect a feedback creation request
-        if form['act'] == 'feedback':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid form credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #begin the feedback 
-            #creation routine
-            else:
-        
-                #create a cursor
-                cursor = con.cursor()          
+                        #report to the front end
+                        return 'success - admin created'
                     
-                #insert the feedback
-                cursor.execute(
-                    'INSERT INTO feedback (userID, clinicID, rating, comment) VALUES (%s, %s, %s, %s)',
-                    (
-                        #userID
-                        user[0],
-                        
-                        #clinicID
-                        form['data'][0],
-                        
-                        #rating
-                        form['data'][1],
-                        
-                        #comment
-                        form['data'][2]
-                    )
-                )
-                
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-                
-                #report a success
-                return 'success: created feedback'
-            
-        #detect an invalid act
-        else:
-        
-            #report invalid act
-            return 'failure: invalid act'
-        
-    #detect a retrieval form
-    elif form['type'] == 'retrieve':
-    
-        #detect a user data request
-        if form['act'] == 'user':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid form credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid form credentials'
-                
-            #begin the user 
-            #retrieval routine 
-            else:
-            
-                #return the user
-                return user    
-        
-        #detect an appointment request
-        elif form['act'] == 'appointment':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid form credentials
-            if user == None:
-                
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #begin appointment data retrieval
-            else: 
-            
-                #create a cursor
-                cursor = con.cursor()
-                
-                #fetch the user's patient entry
-                #from the patient table
-                cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
-                patient = cursor.fetchone()
-                
-                #query the patient's appointments
-                cursor.execute('SELECT * FROM appointments WHERE  patientID = %s', (patient[0],))
-                
-                #handle the query results
-                appointments = []
-                appointment = cursor.fetchone()
-                while appointment != None:
-                
-                    #add the result to the
-                    #appointments array
-                    appointments.append(appointment)
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
                     
-                    #fetch the next appointment
-                    appointment = cursor.fetchone()
-                    
-                #close the cursor
-                cursor.close()
-
-                #return the appointments
-                return tuple(appointments)
-
-        #detect a feedback data request
-        elif form['act'] == 'feedback':
-           
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid form credentials
-                return 'failure: invalid credentials'
-                
-            #begin feedback retrieval
-            else:
-            
-                #create a cursor
-                cursor = con.cursor()
-            
-                #query the feedback table
-                cursor.execute('SELECT * FROM feedback WHERE feedbackID = %s', (form['data'][0],))
-                
-                #fetch the query results
-                feedbackEntries = []
-                feedback = cursor.fetchone()
-                while feedback != None:
-                
-                    #add the result to the
-                    #feedbackEntries array
-                    feedbackEntries.append(feedback)
-                    
-                    #fetch the next feedback
-                    feedback = cursor.fetchone()
-                    
-                #close the cursor
-                cursor.close()
-
-                #return the feedback
-                return tuple(feedbackEntries)
-                
-        #detect an invalid act
-        else:
-        
-            #report invalid act
-            return 'failure: invalid act'
-    
-    #detect an update form
-    elif form['type'] == 'update':
-    
-        #detect an account update request
-        if form['act'] == 'user':
-            
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-            
-            #perform the user update 
-            else: 
-                
-                #create a cursor
-                cursor = con.cursor()
-
-                #check that the user does
-                #not already exist
-                if vacant(form['data'][0], cursor):
-                
-                    #make the table update
-                    cursor.execute(
-                        
-                        #query the update into the user's row
-                        'UPDATE users SET email = %s, password = %s WHERE userID = %s', 
-                        (
-                            #email
-                            form['data'][0],
-                        
-                            #password
-                            passwordHash,
-                        
-                            #userID
-                            user[0]
-                        )  
-                    )
-                    
-                    #close the cursor
-                    cursor.close()
-
-                    #make a commit
-                    con.commit()
-                    
-                    #report the update
-                    return 'success: updated user'
-                
-                #detect invalid form data
+                #detect invalid data format
                 else:
+                    return 'Cfailure@189 - invalid data format'
+                
+            #detect an invalid act
+            else:
+                return 'Cfailure@197 - invalid act, no credentials'
+        
+        #detect a sign in attempt
+        elif form['type'] == 'sign in':
 
+            #try to hash the provided password
+            try: 
+                form['data'][1] = hashlib.sha256(form['data'][1].encode()).hexdigest()
+            except Exception as e:
+                print(e)
+                return 'Cfailure@208 - password hashing failure'
+
+            #try to package the 
+            #recieved form data
+            data = None
+            try: 
+                data = tuple(form['data'])
+            except Exception as e:
+                print(e)
+                return 'Cfailure@217 - packaging failure'
+            
+            #check that data has been properly initialized
+            if data != None:
+
+                #check that the proper number
+                #of parameters have been sent
+                if len(data) == 2:
+
+                    #validate the email type
+                    if not isinstance(data[0], str):
+                        return 'Cfailure@228 - invalid email data type'
+
+                    #validate the password type
+                    if not isinstance(data[1], str):
+                        return 'Cfailure@232 - invalid password data type'
+                    
+                    #create a cursor
+                    cursor = con.cursor()
+                    
+                    #search for the user's table entry
+                    cursor.execute(
+                        "SELECT * FROM admins WHERE email = %s AND password = %s", 
+                        (
+                            data[0], 
+                            data[1]
+                        )
+                    )
+                    
+                    #fetch the search results
+                    user = cursor.fetchone()
+                    
                     #close the cursor
                     cursor.close()
-
-                    #report the failure
-                    return 'failure: email already taken'
-
-        #detect an appointment update request
-        elif form['act'] == 'appointment':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #perform the update
-            else:
-            
-                #create a cursor
-                cursor = con.cursor()
-            
-                #fetch the user's patient entry
-                cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
-                patient = cursor.fetchone()
-                
-                #make the appointment data update
-                cursor.execute(
-                
-                    #query the update into the appointment row
-                    'UPDATE appointments SET clinicID = %s, status = %s WHERE appointmentID = %s AND patientID = %s', 
-                    (
-                        #clinicID
-                        form['data'][0],
                     
-                        #status
-                        form['data'][1],
-                    
-                        #appointmentID
-                        form['data'][2],
+                    #handle invalid credentials
+                    if user == None:
                         
-                        #patientID
-                        patient[0]
-                    )
-                )
+                        #report an invalid email password combo
+                        return 'Cfailure@256 - invalid email/password'
+                    
+                    #perform the sign in routine
+                    else:
+                    
+                        #check if the user is already signed in
+                        signee = authenticate(form, sessions, con)
+                        if signee != None:
+                        
+                            #report that the user is already signed in
+                            return 'Cfailure@266: user already signed in'
+                        
+                        #sign the user in 
+                        else: 
+                        
+                            #create a cookie
+                            cookie = createCookie(user)
+                        
+                            #add the userID to the users list
+                            sessions.append(cookie['session'].value)
+                            print(sessions)
+                            
+                            #return the session cookie
+                            return cookie
+                        
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
                 
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-                
-                #report the update
-                return 'success: updated appointment'
-        
-        #detect a feedback update request
-        elif form['act'] == 'feedback':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
+            #detect invalid data format
+            else:
+                return 'Cfailure@189 - invalid data format'
             
-            #detect invalid credentials
-            if user == None:
-
-                #report invalid credentials
-                return 'failure: invalid credentials'
-            
-            #perform the update
-            else: 
-                
-                #create a cursor
-                cursor = con.cursor()
-                
-                #make the update
-                cursor.execute(
-                    
-                    #query the update into the feedback table
-                    'UPDATE feedback SET clinicID = %s, rating = %s, comment = %s WHERE userID = %s',
-                    (
-                        #clinicID
-                        form['data'][0],
-                    
-                        #rating
-                        form['data'][1],
-                    
-                        #comment
-                        form['data'][2],
-                    
-                        #userID
-                        user[0]
-                    ) 
-                )
-                
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-                
-                #report the update
-                return 'success: feedback updated'
-
-        #detect an invalid act
+        #detect an invalid format
         else:
+            return 'Cfailure@189 - invalid data format'
         
-            #report invalid act
-            return 'failure: invalid act'
-            
-    #detect a deletion form
-    elif form['type'] == 'delete':
-    
-        #detect an account deletion request
-        if form['act'] == 'user':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-        
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #begin user deletion
-            else:
-            
-                #end the user's session
-                endSession(user, sessions)
-                
-                #make a cursor
-                cursor = con.cursor()
-            
-                #make the user deletion
-                cursor.execute('DELETE FROM users WHERE userID = %s', (user[0],))
-                
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-                
-                #report the deletion
-                return 'success: user deleted'
-                
-        #detect an appointment deletion request
-        elif form['act'] == 'appointment':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-        
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #perform the deletion
-            else:
-            
-                #create a cursor
-                cursor = con.cursor()
-                
-                #fetch the user's patient entry
-                cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
-                patient = cursor.fetchone()
-                
-                #delete the appointment
-                cursor.execute(
-                    
-                    #query the deletion
-                    'DELETE FROM appointments WHERE appointmentID = %s AND patientID = %s',
-                    (
-                        #appointmentID
-                        form['data'][0],
-                        
-                        #patientID
-                        patient[0]
-                    )
-                )
-                
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-   
-                #report the deletion
-                return 'success: appointment deleted'
- 
-        
-        #detect a feedback deletion request
-        elif form['act'] == 'feedback':
-        
-            #authenticate the form credentials
-            #against open sessions
-            user = authenticate(form, sessions, con)
-            
-            #detect invalid credentials
-            if user == None:
-            
-                #report invalid credentials
-                return 'failure: invalid credentials'
-                
-            #perform the deletion
-            else:
-            
-                #create a cursor
-                cursor = con.cursor()
-                
-                #delete the appointment
-                cursor.execute(
-                
-                    'DELETE FROM feedbackID WHERE feedbackID = %s AND userID = %s',
-                    (
-                        #feedbackID
-                        form['data'][0],
-                        
-                        #userID
-                        user[0]
-                    )
-                    
-                )
-                
-                #close the cursor
-                cursor.close()
-
-                #make a commit
-                con.commit()
-                
-                #report the deletion
-                return 'success: feedback deleted'
-                
-        #detect an invalid act
-        else:
-        
-            #report invalid act
-            return 'failure: invalid act'
-
-    #report error
+    #detect an accredited admin
+    #request, perform the specified
+    #CRUD operation
     else:
-    
-        return 'failure: invalid request type'
+
+        #detect a creation form
+        if form['type'] == 'create':
+
+            #detect an appointment act
+            if form['act'] == 'appointment':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@311 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 4:
+
+                        #validate the patient id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@322 - invalid patient_id data type'
+                        
+                        #validate the appt type type
+                        if not isinstance(data[1], str) or len(data[1]) > 64:
+                            return 'Cfailure@326 - invalid appt_type data type/length'
+                        
+                        #validate the appt status type
+                        if not isinstance(data[2], str) or len(data[2]) > 16:
+                            return 'Cfailure@330 - invalid appt_status data type/length'
+                        
+                        #validate the appt datetime
+                        if not validDatetime(data[3]):
+                            return 'Cfailure@334 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #insert the appointment
+                        cursor.execute("""(     
+                            INSERT INTO admins (
+                                patient_id, 
+                                appt_type, 
+                                appt_status, 
+                                appt_datetime
+                            ) VALUES (%s, %s, %s, %s)
+                        )""", data)
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front
+                        return 'success - appointment created'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
+            #detect a patient act
+            elif form['act'] == 'patient':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@362 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 6:
+
+                        #validate the patient name type
+                        if not isinstance(data[0], str) or len(data[0]) > 64:
+                            return 'Cfailure@373 - invalid patient_name data type/length'
+                        
+                        #validate the sex type
+                        if not isinstance(data[1], str) or len(data[1]) > 1:
+                            return 'Cfailure@377 - invalid sex data type/length'
+                        
+                        #validate the age type
+                        if not isinstance(data[2], int):
+                            return 'Cfailure@381 - invalid age data type'
+
+                        #validate the emergency contact type
+                        if not isinstance(data[3], str) or len(data[3]) > 64:
+                            return 'Cfailure@385 - invalid emergency contact data type/length'
+                        
+                        #validate the healthcard number type
+                        if not isinstance(data[4], int):
+                            return 'Cfailure@389 - invalid healthcard number data type'
+                        
+                        #validate the patient's address
+                        if not isinstance(data[5], str) or len(data[5]) > 64:
+                            return 'Cfailure@393 - invalid address data type/length'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #make the insertion
+                        cursor.execute("""INSERT INTO patients(
+                            patient_name,
+                            sex,
+                            age,
+                            emerg_contact,
+                            healthcard_no,
+                            address
+                        ) VALUES (%s, %s, %s, %s, %s, %s)""", data)
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end
+                        return 'success - patient created'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
+            #detect a medical record act
+            elif form['act'] == 'medical_record':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@126 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 4:
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@460 - invalid patient_id data type'
+                        
+                        #validate the diagnoses type
+                        if not isinstance(data[1], str):
+                            return 'Cfailure@464 - invalid diagnoses data type'
+                        
+                        #validate the med_hist type
+                        if not isinstance(data[2], str):
+                            return 'Cfailure@468 - invalid med_hist data type'
+                        
+                        #validate the medication type
+                        if not isinstance(data[3], str): 
+                            return 'Cfailure@472 - invalid medication data type'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #make the insertion
+                        cursor.execute("""INSERT INTO medical_records(
+                            patient_id,
+                            diagnoses,
+                            med_hist,
+                            medication
+                        ) VALUES (%s, %s, %s, %s)""", data)
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end
+                        return 'success - created medical record'
+
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
+            #detect an invalid act
+            else:
+                return 'Cfailure - invalid act'
+            
+        #detect a retrieval form
+        elif form['type'] == 'retrieve':
+
+            #detect an admin act
+            if form['act'] == 'admin':
+
+            #detect an appointment act
+            elif form['act'] == 'appointment':
+
+            #detect a patient act
+            elif form['act'] == 'patient':
+
+            #detect a medical record act
+            elif form['act'] == 'medical_record':
+
+            #detect an invalid act
+            else:
+                return 'Cfailure - invalid act'
+            
+        #detect an update form
+        elif form['type'] == 'update':
+
+            #detect an admin act
+            if form['act'] == 'admin':
+
+            #detect an appointment act
+            elif form['act'] == 'appointment':
+
+            #detect a patient act
+            elif form['act'] == 'patient':
+
+            #detect a medical record act
+            elif form['act'] == 'medical_record':
+
+            #detect an invalid act
+            else:
+                return 'Cfailure - invalid act'
+            
+        #detect a delete form
+        elif form['type'] == 'delete':
+
+            #detect an admin act
+            if form['act'] == 'admin':
+
+            #detect an appointment act
+            elif form['act'] == 'appointment':
+
+            #detect a patient act
+            elif form['act'] == 'patient':
+
+            #detect a medical record act
+            elif form['act'] == 'medical_record':
+
+            #detect an invalid act
+            else:
+                return 'Cfailure - invalid act'
+            
+        #detect an invalid type
+        else:
+            return 'Cfailure - invalid type'
 
 #define a user authentication function
 def authenticate(form, sessions, con):
@@ -780,7 +575,7 @@ def authenticate(form, sessions, con):
         cursor = con.cursor()
         
         #query the user entry
-        cursor.execute('SELECT * FROM users WHERE userID = %s', (form['cookie'],))
+        cursor.execute('SELECT * FROM admins WHERE user_id = %s', (form['cookie'],))
         
         #fetch the result 
         user = cursor.fetchone()
@@ -851,6 +646,25 @@ def vacant(username, cursor):
     if result != None:
         return False
     else: 
+        return True
+    
+#define a row absence detection function
+def notin(row_name, row_val, table, con):
+    
+    #create a cursor
+    cursor = con.cursor()
+
+    #search the table for the row_id
+    cursor.execute(f'SELECT * FROM {table} WHERE {row_name} = %s', (row_val,))
+    row = cursor.fetchone()
+
+    #close the cursor
+    cursor.close()
+
+    #return whether or not the row exist
+    if row != None:
+        return False
+    else:
         return True
     
 #define a datetime validator function

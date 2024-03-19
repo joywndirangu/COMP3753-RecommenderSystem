@@ -85,9 +85,6 @@ def makeHTTPRequestHandler(childConn):
             #handle the POST request
             form = self.handlePost()
 
-            #print the headers
-            print(self.headers)
-
             #attempt to retrieve the 'Cookie' header from the request
             cookie_header = self.headers.get('Cookie')
             cookie_value = None
@@ -145,11 +142,10 @@ def makeHTTPRequestHandler(childConn):
                 #string and include it in the Set-Cookie header
                 for morsel in result.values():
                     self.send_header('Set-Cookie', morsel.OutputString())
-                    print('monitor: '+morsel.OutputString())
                 self.end_headers()
                 
                 #write any additional response body content if necessary
-                response_body = "success: cookie set successfully."
+                response_body = "success - cookie set successfully."
                 self.wfile.write(response_body.encode())
 
         #define a get handler function

@@ -30,14 +30,12 @@ def main():
 
         #listen for incoming requests
         form = mon.recv()
-        print(f'main: {form}')
+        print(f'main - {form}')
         
         #handle the query forms with con
         #and respond using mon
-        mon.send(connector.handle(con, form, sessions))
+        mon.send(connector.handle(form, sessions, con))
 
 #start the backend
 if __name__ == "__main__":
-    
-    #call main
     main()
