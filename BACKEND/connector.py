@@ -2,13 +2,14 @@
 #This file serves to provide the backend access to the supporting	#
 #database management system (MySQL).								#
 #																	#
-#All iteractions between MySQL and the backend architecture shall be# 
-#facilitated by the use of resources defined within this script.    # 
+#All iteractions between MySQL and the backend architecture shall be#
+#facilitated by the use of resources defined within this script.    #
 #####################################################################
 import mysql.connector
 import hashlib
 from http.cookies import SimpleCookie
 from datetime import datetime, timedelta
+import json
 
 #define a init function
 def init():
@@ -113,7 +114,7 @@ def handle(form, sessions, con):
         if form['type'] == 'create':
 
             #detect a admin creation request
-            if form['act'] == 'user':
+            if form['act'] == 'admin':
 
                 #try to hash the provided password
                 try: 
@@ -141,11 +142,11 @@ def handle(form, sessions, con):
                         #validate the clinic_id type
                         if not isinstance(data[0], int):
                             return 'Cfailure@142 - invalid clinic_id data type'
-                        
+
                         #validate the role type
                         if not isinstance(data[1], str) or len(data[1]) > 64:
                             return 'Cfailure@146 - invalid role data type/length'
-                        
+         
                         #validate name type
                         if not isinstance(data[2], str) or len(data[2]) > 64:
                             return 'Cfailure@150 - invalid name data type/length'
@@ -159,7 +160,7 @@ def handle(form, sessions, con):
                             return 'Cfailure@158 - invalid password data type/length'
                         
                         #validate patients type
-                        if not isinstance(data[5], str):
+                        if not isinstance(data[5], str) or data[5] != '[]':
                             return 'Cfailure@162 - invalid patients data type'
                 
                         #create a cursor
@@ -295,6 +296,9 @@ def handle(form, sessions, con):
     #CRUD operation
     else:
 
+        #parse the admin's patient list
+        patient_list = json.loads(user[6])
+
         #detect a creation form
         if form['type'] == 'create':
 
@@ -312,6 +316,12 @@ def handle(form, sessions, con):
                 
                 #handle the recieved data
                 if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -343,8 +353,9 @@ def handle(form, sessions, con):
                                 appt_type, 
                                 appt_status, 
                                 appt_datetime
-                            ) VALUES (%s, %s, %s, %s)
-                        )""", data)
+                            ) VALUES (%s, %s, %s, %s)""", 
+                            data
+                        )
 
                         #close the cursor
                         cursor.close()
@@ -378,6 +389,12 @@ def handle(form, sessions, con):
                 #handle the recieved data
                 if data != None:
 
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+
                     #check that the proper number
                     #of parameters have been sent
                     if len(data) == 6:
@@ -410,14 +427,22 @@ def handle(form, sessions, con):
                         cursor = con.cursor()
 
                         #make the insertion
-                        cursor.execute("""INSERT INTO patients(
-                            patient_name,
-                            sex,
-                            age,
-                            emerg_contact,
-                            healthcard_no,
-                            address
-                        ) VALUES (%s, %s, %s, %s, %s, %s)""", data)
+                        cursor.execute(
+                            """INSERT INTO patients(
+                                patient_name,
+                                sex,
+                                age,
+                                emerg_contact,
+                                healthcard_no,
+                                address
+                            ) VALUES (%s, %s, %s, %s, %s, %s)""", 
+                            data
+                        )
+
+                        #add the patient_id to
+                        #the admins patient list
+                        cursor.execute("""SELECT LAST_INSERT_ID()""")
+                        patient_list.append(cursor.fetchone()[0])
 
                         #close the cursor
                         cursor.close()
@@ -480,7 +505,9 @@ def handle(form, sessions, con):
                             diagnoses,
                             med_hist,
                             medication
-                        ) VALUES (%s, %s, %s, %s)""", data)
+                            ) VALUES (%s, %s, %s, %s)""", 
+                            data
+                        )
 
                         #close the cursor
                         cursor.close()
@@ -509,14 +536,174 @@ def handle(form, sessions, con):
             #detect an admin act
             if form['act'] == 'admin':
 
+                #return the admin
+                return user
+
             #detect an appointment act
             elif form['act'] == 'appointment':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@546 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@555 - patient not bound to admin'
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 1: 
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@460 - invalid patient_id data type'
+
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #fetch all appointments for the patient
+                        cursor.execute("""SELECT * FROM appointments WHERE patient_id = %s""", (data[0],))
+
+                        #fetch the found appointments
+                        appointments = []
+                        appointment = cursor.fetchone()
+                        while appointment != None:
+                            appointments.append(appointment)
+                            appointment = cursor.fetchone()
+
+                        #close the cursor
+                        cursor.close()
+
+                        #return the appointments 
+                        #to the front end
+                        return tuple(appointments)
+
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
 
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@546 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@555 - patient not bound to admin'                
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 1: 
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int):
+                            return 'Cfailure@460 - invalid patient_id data type'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #select the patient entry
+                        cursor.execute("""SELECT * FROM patients WHERE patient_id = %s""", (data[0],))
+
+                        #fetch the result
+                        patient = cursor.fetchone()
+
+                        #close the cursor
+                        cursor.close()
+                        
+                        #return the result
+                        return patient
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+                    
             #detect a medical record act
             elif form['act'] == 'medical_record':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@546 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@555 - patient not bound to admin'
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 1: 
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@460 - invalid patient_id data type'
+
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #select the patient's records
+                        cursor.execute("""SELECT * FROM patients WHERE patient_id = %s""", (data[0],))
+
+                        #fetch the query results
+                        records = []
+                        record = cursor.fetchone()
+                        while record != None:
+                            records.append(record)
+                            record = cursor.fetchone()
+
+                        #close the cursor
+                        cursor.close()
+
+                        #return the appointments 
+                        #to the front end
+                        return tuple(records)
+                        
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect an invalid act
             else:
@@ -528,14 +715,323 @@ def handle(form, sessions, con):
             #detect an admin act
             if form['act'] == 'admin':
 
+                #try to hash the provided password
+                try: 
+                    form['data'][4] = hashlib.sha256(form['data'][4].encode()).hexdigest()
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@127 - password hashing failure'
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@126 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 7:
+
+                        #validate the clinic_id type
+                        if not isinstance(data[0], int):
+                            return 'Cfailure@142 - invalid clinic_id data type'
+
+                        #validate the role type
+                        if not isinstance(data[1], str) or len(data[1]) > 64:
+                            return 'Cfailure@146 - invalid role data type/length'
+         
+                        #validate name type
+                        if not isinstance(data[2], str) or len(data[2]) > 64:
+                            return 'Cfailure@150 - invalid name data type/length'
+
+                        #validate email type
+                        if not isinstance(data[3], str) or len(data[3]) > 64:
+                            return 'Cfailure@154 - invalid email data type/length'
+                        
+                        #validate password type
+                        if not isinstance(data[4], str) or len(data[4]) > 64:
+                            return 'Cfailure@158 - invalid password data type/length'
+                        
+                        #validate patients type
+                        if not isinstance(data[5], str) or data[5] != '[]':
+                            return 'Cfailure@162 - invalid patients data type'
+                        
+                        #validate user_id type
+                        if not isinstance(data[6], int):
+                            return 'Cfailure@767 - invalid user_id type'
+                
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #check if the provided email
+                        #is already in use
+                        if not vacant(data[3], cursor):
+                            return 'Cfailure@170 - provided email already in use'
+                        
+                        #insert the user
+                        cursor.execute("""(     
+                            UPDATE admins SET
+                            clinic_id = %s, 
+                            role = %s, 
+                            name = %s, 
+                            email = %s, 
+                            password = %s, 
+                            patients = %s
+                            WHERE user_id = %s""", 
+                            data
+                        )
+
+                        #close the cursor
+                        cursor.close()
+
+                        #report to the front end
+                        return 'success - admin updated'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
             #detect an appointment act
             elif form['act'] == 'appointment':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@311 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[1] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 5:
+
+                        #validate the patient id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@322 - invalid patient_id data type'
+                        
+                        #validate the appt type type
+                        if not isinstance(data[1], str) or len(data[1]) > 64:
+                            return 'Cfailure@326 - invalid appt_type data type/length'
+                        
+                        #validate the appt status type
+                        if not isinstance(data[2], str) or len(data[2]) > 16:
+                            return 'Cfailure@330 - invalid appt_status data type/length'
+                        
+                        #validate the appt datetime
+                        if not validDatetime(data[3]):
+                            return 'Cfailure@334 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
+                        
+                        #validate the appt_id type
+                        if not isinstance(data[4], int):
+                            return 'Cfailure@739 - invalid appt_id data type'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #update the appointment
+                        cursor.execute("""     
+                            UPDATE appointments SET
+                            patient_id = %s, 
+                            appt_type = %s, 
+                            appt_status = %s, 
+                            appt_datetime = %s
+                            WHERE appt_id = %s""", 
+                            data
+                        )
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front
+                        return 'success - appointment updated'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
 
+                #try to package the 
+                #recieved form data
+                data = None
+                try: 
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@362 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[6] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 7:
+
+                        #validate the patient name type
+                        if not isinstance(data[0], str) or len(data[0]) > 64:
+                            return 'Cfailure@373 - invalid patient_name data type/length'
+                        
+                        #validate the sex type
+                        if not isinstance(data[1], str) or len(data[1]) > 1:
+                            return 'Cfailure@377 - invalid sex data type/length'
+                        
+                        #validate the age type
+                        if not isinstance(data[2], int):
+                            return 'Cfailure@381 - invalid age data type'
+
+                        #validate the emergency contact type
+                        if not isinstance(data[3], str) or len(data[3]) > 64:
+                            return 'Cfailure@385 - invalid emergency contact data type/length'
+                        
+                        #validate the healthcard number type
+                        if not isinstance(data[4], int):
+                            return 'Cfailure@389 - invalid healthcard number data type'
+                        
+                        #validate the patient's address
+                        if not isinstance(data[5], str) or len(data[5]) > 64:
+                            return 'Cfailure@393 - invalid address data type/length'
+                        
+                        #validate the patient_id
+                        if not isinstance(data[6], int):
+                            return 'Cfailure@931 - invalid patient_id data type'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #make the update
+                        cursor.execute("""
+                            UPDATE patients SET
+                            patient_name = %s,
+                            sex = %s,
+                            age = %s,
+                            emerg_contact = %s,
+                            healthcard_no = %s,
+                            address = %s
+                            WHERE patient_id = %s""", 
+                            data
+                        )
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end
+                        return 'success - patient updated'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
             #detect a medical record act
             elif form['act'] == 'medical_record':
+
+                #try to package the
+                #recieved form data
+                data = None
+                try:
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@126 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 5:
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@460 - invalid patient_id data type'
+                        
+                        #validate the diagnoses type
+                        if not isinstance(data[1], str):
+                            return 'Cfailure@464 - invalid diagnoses data type'
+                        
+                        #validate the med_hist type
+                        if not isinstance(data[2], str):
+                            return 'Cfailure@468 - invalid med_hist data type'
+                        
+                        #validate the medication type
+                        if not isinstance(data[3], str): 
+                            return 'Cfailure@472 - invalid medication data type'
+                        
+                        #validate the record_id
+                        if not isinstance(data[4], int):
+                            return 'Cfailure@1003 - invalid record_id data type'
+                        
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #make the insertion
+                        cursor.execute(
+                            """UPDATE medical_records SET
+                            patient_id = %s,
+                            diagnoses = %s,
+                            med_hist = %s,
+                            medication = %s
+                            WHERE record_id = %s""", 
+                            data
+                        )
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end
+                        return 'success - updated medical record'
+
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect an invalid act
             else:
