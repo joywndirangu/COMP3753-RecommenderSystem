@@ -71,7 +71,7 @@ def init():
     
         record_id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT,
-        FOREIGN KEY (patient_id) REFERENCES patient (patient_id) ON DELETE CASCADE,
+        FOREIGN KEY (patient_id) REFERENCES patients(patient_id) ON DELETE CASCADE,
         diagnoses TEXT,
         med_hist TEXT,
         medication TEXT
@@ -121,7 +121,7 @@ def handle(form, sessions, con):
                     form['data'][4] = hashlib.sha256(form['data'][4].encode()).hexdigest()
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@127 - password hashing failure'
+                    return 'Cfailure@124 - password hashing failure'
 
                 #try to package the 
                 #recieved form data
@@ -130,7 +130,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@126 - packaging failure'
+                    return 'Cfailure@133 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -141,27 +141,27 @@ def handle(form, sessions, con):
 
                         #validate the clinic_id type
                         if not isinstance(data[0], int):
-                            return 'Cfailure@142 - invalid clinic_id data type'
+                            return 'Cfailure@144 - invalid clinic_id data type'
 
                         #validate the role type
                         if not isinstance(data[1], str) or len(data[1]) > 64:
-                            return 'Cfailure@146 - invalid role data type/length'
+                            return 'Cfailure@148 - invalid role data type/length'
          
                         #validate name type
                         if not isinstance(data[2], str) or len(data[2]) > 64:
-                            return 'Cfailure@150 - invalid name data type/length'
+                            return 'Cfailure@152 - invalid name data type/length'
 
                         #validate email type
                         if not isinstance(data[3], str) or len(data[3]) > 64:
-                            return 'Cfailure@154 - invalid email data type/length'
+                            return 'Cfailure@156 - invalid email data type/length'
                         
                         #validate password type
                         if not isinstance(data[4], str) or len(data[4]) > 64:
-                            return 'Cfailure@158 - invalid password data type/length'
+                            return 'Cfailure@160 - invalid password data type/length'
                         
                         #validate patients type
                         if not isinstance(data[5], str) or data[5] != '[]':
-                            return 'Cfailure@162 - invalid patients data type'
+                            return 'Cfailure@164 - invalid patients data type'
                 
                         #create a cursor
                         cursor = con.cursor()
@@ -169,7 +169,7 @@ def handle(form, sessions, con):
                         #check if the provided email
                         #is already in use
                         if not vacant(data[3], cursor):
-                            return 'Cfailure@170 - provided email already in use'
+                            return 'Cfailure@172 - provided email already in use'
                         
                         #insert the user
                         cursor.execute("""(     
@@ -188,15 +188,15 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@191 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@195 - invalid data format'
                 
             #detect an invalid act
             else:
-                return 'Cfailure@197 - invalid act, no credentials'
+                return 'Cfailure@199 - invalid act, no credentials'
         
         #detect a sign in attempt
         elif form['type'] == 'sign in':
@@ -206,7 +206,7 @@ def handle(form, sessions, con):
                 form['data'][1] = hashlib.sha256(form['data'][1].encode()).hexdigest()
             except Exception as e:
                 print(e)
-                return 'Cfailure@208 - password hashing failure'
+                return 'Cfailure@209 - password hashing failure'
 
             #try to package the 
             #recieved form data
@@ -215,7 +215,7 @@ def handle(form, sessions, con):
                 data = tuple(form['data'])
             except Exception as e:
                 print(e)
-                return 'Cfailure@217 - packaging failure'
+                return 'Cfailure@218 - packaging failure'
             
             #check that data has been properly initialized
             if data != None:
@@ -226,11 +226,11 @@ def handle(form, sessions, con):
 
                     #validate the email type
                     if not isinstance(data[0], str):
-                        return 'Cfailure@228 - invalid email data type'
+                        return 'Cfailure@229 - invalid email data type'
 
                     #validate the password type
                     if not isinstance(data[1], str):
-                        return 'Cfailure@232 - invalid password data type'
+                        return 'Cfailure@233 - invalid password data type'
                     
                     #create a cursor
                     cursor = con.cursor()
@@ -254,7 +254,7 @@ def handle(form, sessions, con):
                     if user == None:
                         
                         #report an invalid email password combo
-                        return 'Cfailure@256 - invalid email/password'
+                        return 'Cfailure@257 - invalid email/password'
                     
                     #perform the sign in routine
                     else:
@@ -264,7 +264,7 @@ def handle(form, sessions, con):
                         if signee != None:
                         
                             #report that the user is already signed in
-                            return 'Cfailure@266: user already signed in'
+                            return 'Cfailure@267: user already signed in'
                         
                         #sign the user in 
                         else: 
@@ -281,15 +281,15 @@ def handle(form, sessions, con):
                         
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@284 - invalid data format'
                 
             #detect invalid data format
             else:
-                return 'Cfailure@189 - invalid data format'
+                return 'Cfailure@288 - invalid data format'
             
         #detect an invalid format
         else:
-            return 'Cfailure@189 - invalid data format'
+            return 'Cfailure@292 - invalid data format'
         
     #detect an accredited admin
     #request, perform the specified
@@ -312,7 +312,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@311 - packaging failure'
+                    return 'Cfailure@315 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -329,19 +329,19 @@ def handle(form, sessions, con):
 
                         #validate the patient id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@322 - invalid patient_id data type'
+                            return 'Cfailure@332 - invalid patient_id data type'
                         
                         #validate the appt type type
                         if not isinstance(data[1], str) or len(data[1]) > 64:
-                            return 'Cfailure@326 - invalid appt_type data type/length'
+                            return 'Cfailure@336 - invalid appt_type data type/length'
                         
                         #validate the appt status type
                         if not isinstance(data[2], str) or len(data[2]) > 16:
-                            return 'Cfailure@330 - invalid appt_status data type/length'
+                            return 'Cfailure@340 - invalid appt_status data type/length'
                         
                         #validate the appt datetime
                         if not validDatetime(data[3]):
-                            return 'Cfailure@334 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
+                            return 'Cfailure@344 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -368,11 +368,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@371 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@375 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
@@ -384,7 +384,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@362 - packaging failure'
+                    return 'Cfailure@387 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -401,27 +401,27 @@ def handle(form, sessions, con):
 
                         #validate the patient name type
                         if not isinstance(data[0], str) or len(data[0]) > 64:
-                            return 'Cfailure@373 - invalid patient_name data type/length'
+                            return 'Cfailure@404 - invalid patient_name data type/length'
                         
                         #validate the sex type
                         if not isinstance(data[1], str) or len(data[1]) > 1:
-                            return 'Cfailure@377 - invalid sex data type/length'
+                            return 'Cfailure@408 - invalid sex data type/length'
                         
                         #validate the age type
                         if not isinstance(data[2], int):
-                            return 'Cfailure@381 - invalid age data type'
+                            return 'Cfailure@412 - invalid age data type'
 
                         #validate the emergency contact type
                         if not isinstance(data[3], str) or len(data[3]) > 64:
-                            return 'Cfailure@385 - invalid emergency contact data type/length'
+                            return 'Cfailure@416 - invalid emergency contact data type/length'
                         
                         #validate the healthcard number type
                         if not isinstance(data[4], int):
-                            return 'Cfailure@389 - invalid healthcard number data type'
+                            return 'Cfailure@420 - invalid healthcard number data type'
                         
                         #validate the patient's address
                         if not isinstance(data[5], str) or len(data[5]) > 64:
-                            return 'Cfailure@393 - invalid address data type/length'
+                            return 'Cfailure@424 - invalid address data type/length'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -455,11 +455,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@458 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@462 - invalid data format'
 
             #detect a medical record act
             elif form['act'] == 'medical_record':
@@ -471,7 +471,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@126 - packaging failure'
+                    return 'Cfailure@474 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -482,19 +482,19 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@485 - invalid patient_id data type'
                         
                         #validate the diagnoses type
                         if not isinstance(data[1], str):
-                            return 'Cfailure@464 - invalid diagnoses data type'
+                            return 'Cfailure@489 - invalid diagnoses data type'
                         
                         #validate the med_hist type
                         if not isinstance(data[2], str):
-                            return 'Cfailure@468 - invalid med_hist data type'
+                            return 'Cfailure@493 - invalid med_hist data type'
                         
                         #validate the medication type
                         if not isinstance(data[3], str): 
-                            return 'Cfailure@472 - invalid medication data type'
+                            return 'Cfailure@497 - invalid medication data type'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -520,15 +520,15 @@ def handle(form, sessions, con):
 
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@523 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@527 - invalid data format'
 
             #detect an invalid act
             else:
-                return 'Cfailure - invalid act'
+                return 'Cfailure@531 - invalid act'
             
         #detect a retrieval form
         elif form['type'] == 'retrieve':
@@ -549,7 +549,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@546 - packaging failure'
+                    return 'Cfailure@552 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -558,7 +558,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@555 - patient not bound to admin'
+                        return 'Cfailure@561 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -566,7 +566,7 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@569 - invalid patient_id data type'
 
                         #create a cursor
                         cursor = con.cursor()
@@ -590,11 +590,11 @@ def handle(form, sessions, con):
 
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@593 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@597 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
@@ -606,7 +606,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@546 - packaging failure'
+                    return 'Cfailure@609 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -615,7 +615,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@555 - patient not bound to admin'                
+                        return 'Cfailure@618 - patient not bound to admin'                
 
                     #check that the proper number
                     #of parameters have been sent
@@ -623,7 +623,7 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@626 - invalid patient_id data type'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -642,11 +642,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@645 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@649 - invalid data format'
                     
             #detect a medical record act
             elif form['act'] == 'medical_record':
@@ -658,7 +658,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@546 - packaging failure'
+                    return 'Cfailure@661 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -667,7 +667,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@555 - patient not bound to admin'
+                        return 'Cfailure@670 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -675,7 +675,7 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@678 - invalid patient_id data type'
 
                         #create a cursor
                         cursor = con.cursor()
@@ -699,15 +699,15 @@ def handle(form, sessions, con):
                         
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@702 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@706 - invalid data format'
 
             #detect an invalid act
             else:
-                return 'Cfailure - invalid act'
+                return 'Cfailure@710 - invalid act'
             
         #detect an update form
         elif form['type'] == 'update':
@@ -720,7 +720,7 @@ def handle(form, sessions, con):
                     form['data'][4] = hashlib.sha256(form['data'][4].encode()).hexdigest()
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@127 - password hashing failure'
+                    return 'Cfailure@723 - password hashing failure'
 
                 #try to package the 
                 #recieved form data
@@ -729,7 +729,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@126 - packaging failure'
+                    return 'Cfailure@732 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -740,27 +740,27 @@ def handle(form, sessions, con):
 
                         #validate the clinic_id type
                         if not isinstance(data[0], int):
-                            return 'Cfailure@142 - invalid clinic_id data type'
+                            return 'Cfailure@743 - invalid clinic_id data type'
 
                         #validate the role type
                         if not isinstance(data[1], str) or len(data[1]) > 64:
-                            return 'Cfailure@146 - invalid role data type/length'
+                            return 'Cfailure@747 - invalid role data type/length'
          
                         #validate name type
                         if not isinstance(data[2], str) or len(data[2]) > 64:
-                            return 'Cfailure@150 - invalid name data type/length'
+                            return 'Cfailure@751 - invalid name data type/length'
 
                         #validate email type
                         if not isinstance(data[3], str) or len(data[3]) > 64:
-                            return 'Cfailure@154 - invalid email data type/length'
+                            return 'Cfailure@755 - invalid email data type/length'
                         
                         #validate password type
                         if not isinstance(data[4], str) or len(data[4]) > 64:
-                            return 'Cfailure@158 - invalid password data type/length'
+                            return 'Cfailure@759 - invalid password data type/length'
                         
                         #validate patients type
                         if not isinstance(data[5], str) or data[5] != '[]':
-                            return 'Cfailure@162 - invalid patients data type'
+                            return 'Cfailure@763 - invalid patients data type'
                         
                         #validate user_id type
                         if not isinstance(data[6], int):
@@ -772,7 +772,7 @@ def handle(form, sessions, con):
                         #check if the provided email
                         #is already in use
                         if not vacant(data[3], cursor):
-                            return 'Cfailure@170 - provided email already in use'
+                            return 'Cfailure@775 - provided email already in use'
                         
                         #insert the user
                         cursor.execute("""(     
@@ -795,11 +795,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@798 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@801 - invalid data format'
 
             #detect an appointment act
             elif form['act'] == 'appointment':
@@ -811,7 +811,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@311 - packaging failure'
+                    return 'Cfailure@814 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -820,7 +820,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[1] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
+                        return 'Cfailure@823 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -828,23 +828,23 @@ def handle(form, sessions, con):
 
                         #validate the patient id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@322 - invalid patient_id data type'
+                            return 'Cfailure@831 - invalid patient_id data type'
                         
                         #validate the appt type type
                         if not isinstance(data[1], str) or len(data[1]) > 64:
-                            return 'Cfailure@326 - invalid appt_type data type/length'
+                            return 'Cfailure@835 - invalid appt_type data type/length'
                         
                         #validate the appt status type
                         if not isinstance(data[2], str) or len(data[2]) > 16:
-                            return 'Cfailure@330 - invalid appt_status data type/length'
+                            return 'Cfailure@839 - invalid appt_status data type/length'
                         
                         #validate the appt datetime
                         if not validDatetime(data[3]):
-                            return 'Cfailure@334 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
+                            return 'Cfailure@843 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
                         
                         #validate the appt_id type
                         if not isinstance(data[4], int):
-                            return 'Cfailure@739 - invalid appt_id data type'
+                            return 'Cfailure@847 - invalid appt_id data type'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -871,11 +871,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@874 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@878 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
@@ -887,7 +887,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@362 - packaging failure'
+                    return 'Cfailure@890 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -896,7 +896,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[6] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
+                        return 'Cfailure@899 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -904,27 +904,27 @@ def handle(form, sessions, con):
 
                         #validate the patient name type
                         if not isinstance(data[0], str) or len(data[0]) > 64:
-                            return 'Cfailure@373 - invalid patient_name data type/length'
+                            return 'Cfailure@907 - invalid patient_name data type/length'
                         
                         #validate the sex type
                         if not isinstance(data[1], str) or len(data[1]) > 1:
-                            return 'Cfailure@377 - invalid sex data type/length'
+                            return 'Cfailure@911 - invalid sex data type/length'
                         
                         #validate the age type
                         if not isinstance(data[2], int):
-                            return 'Cfailure@381 - invalid age data type'
+                            return 'Cfailure@915 - invalid age data type'
 
                         #validate the emergency contact type
                         if not isinstance(data[3], str) or len(data[3]) > 64:
-                            return 'Cfailure@385 - invalid emergency contact data type/length'
+                            return 'Cfailure@919 - invalid emergency contact data type/length'
                         
                         #validate the healthcard number type
                         if not isinstance(data[4], int):
-                            return 'Cfailure@389 - invalid healthcard number data type'
+                            return 'Cfailure@923 - invalid healthcard number data type'
                         
                         #validate the patient's address
                         if not isinstance(data[5], str) or len(data[5]) > 64:
-                            return 'Cfailure@393 - invalid address data type/length'
+                            return 'Cfailure@927 - invalid address data type/length'
                         
                         #validate the patient_id
                         if not isinstance(data[6], int):
@@ -957,11 +957,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@960 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@964 - invalid data format'
 
             #detect a medical record act
             elif form['act'] == 'medical_record':
@@ -973,7 +973,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@126 - packaging failure'
+                    return 'Cfailure@976 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -984,19 +984,19 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@987 - invalid patient_id data type'
                         
                         #validate the diagnoses type
                         if not isinstance(data[1], str):
-                            return 'Cfailure@464 - invalid diagnoses data type'
+                            return 'Cfailure@991 - invalid diagnoses data type'
                         
                         #validate the med_hist type
                         if not isinstance(data[2], str):
-                            return 'Cfailure@468 - invalid med_hist data type'
+                            return 'Cfailure@995 - invalid med_hist data type'
                         
                         #validate the medication type
                         if not isinstance(data[3], str): 
-                            return 'Cfailure@472 - invalid medication data type'
+                            return 'Cfailure@999 - invalid medication data type'
                         
                         #validate the record_id
                         if not isinstance(data[4], int):
@@ -1027,15 +1027,15 @@ def handle(form, sessions, con):
 
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@1030 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@1034 - invalid data format'
 
             #detect an invalid act
             else:
-                return 'Cfailure - invalid act'
+                return 'Cfailure@1038 - invalid act'
             
         #detect a delete form
         elif form['type'] == 'delete':
@@ -1072,7 +1072,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@311 - packaging failure'
+                    return 'Cfailure@1075 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -1081,7 +1081,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
+                        return 'Cfailure@1084 - patient not bound to admin'
 
                     #check that the proper number
                     #of parameters have been sent
@@ -1089,7 +1089,7 @@ def handle(form, sessions, con):
 
                         #validate the appt_id type
                         if not isinstance(data[1], int):
-                            return 'Cfailure@739 - invalid appt_id data type'                                 
+                            return 'Cfailure@1092 - invalid appt_id data type'                                 
 
                         #create a cursor
                         cursor = con.cursor()
@@ -1108,11 +1108,11 @@ def handle(form, sessions, con):
                     
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@1111 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@1115 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
@@ -1124,7 +1124,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@311 - packaging failure'
+                    return 'Cfailure@1127 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -1133,7 +1133,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
+                        return 'Cfailure@1136 - patient not bound to admin'
                     
                     #check that the proper number
                     #of parameters have been sent
@@ -1141,7 +1141,7 @@ def handle(form, sessions, con):
 
                         #validate the patient_id type
                         if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
-                            return 'Cfailure@460 - invalid patient_id data type'
+                            return 'Cfailure@1144 - invalid patient_id data type'
                     
                         #create a cursor
                         cursor = con.cursor()
@@ -1160,11 +1160,11 @@ def handle(form, sessions, con):
 
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@1163 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@1167 - invalid data format'
 
             #detect a medical record act
             elif form['act'] == 'medical_record':
@@ -1176,7 +1176,7 @@ def handle(form, sessions, con):
                     data = tuple(form['data'])
                 except Exception as e:
                     print(e)
-                    return 'Cfailure@311 - packaging failure'
+                    return 'Cfailure@1179 - packaging failure'
                 
                 #handle the recieved data
                 if data != None:
@@ -1185,7 +1185,7 @@ def handle(form, sessions, con):
                     #patient id is contained within
                     #the admin's patient list
                     if data[0] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
+                        return 'Cfailure@1188 - patient not bound to admin'
                     
                     #check that the proper number
                     #of parameters have been sent
@@ -1193,7 +1193,7 @@ def handle(form, sessions, con):
 
                         #validate the record_id
                         if not isinstance(data[1], int):
-                            return 'Cfailure@1003 - invalid record_id data type'
+                            return 'Cfailure@1196 - invalid record_id data type'
 
                         #create a cursor
                         cursor = con.cursor()
@@ -1212,19 +1212,19 @@ def handle(form, sessions, con):
                 
                     #detect invalid data format
                     else:
-                        return 'Cfailure@189 - invalid data format'
+                        return 'Cfailure@1215 - invalid data format'
                     
                 #detect invalid data format
                 else:
-                    return 'Cfailure@189 - invalid data format'
+                    return 'Cfailure@1219 - invalid data format'
 
             #detect an invalid act
             else:
-                return 'Cfailure - invalid act'
+                return 'Cfailure1223 - invalid act'
             
         #detect an invalid type
         else:
-            return 'Cfailure - invalid type'
+            return 'Cfailure1227 - invalid type'
 
 #define a user authentication function
 def authenticate(form, sessions, con):
