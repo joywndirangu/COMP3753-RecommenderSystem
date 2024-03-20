@@ -71,7 +71,7 @@ def init():
     
         record_id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT,
-        FOREIGN KEY (patient_id) REFERENCES patient (patient_id),
+        FOREIGN KEY (patient_id) REFERENCES patient (patient_id) ON DELETE CASCADE,
         diagnoses TEXT,
         med_hist TEXT,
         medication TEXT
@@ -83,7 +83,7 @@ def init():
 
         appt_id INT AUTO_INCREMENT PRIMARY KEY,
         patient_id INT,
-        FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+        FOREIGN KEY (patient_id) REFERENCES patients(patient_id) ON DELETE CASCADE,
         appt_type VARCHAR(64) NOT NULL,
         appt_status VARCHAR(64) NOT NULL,
         appt_datetime DATETIME NOT NULL
@@ -1043,14 +1043,180 @@ def handle(form, sessions, con):
             #detect an admin act
             if form['act'] == 'admin':
 
+                #end the admin's session
+                sessions.remove(user)
+
+                #create a cursor
+                cursor = con.cursor()
+
+                #delete their entry from the
+                #admins table
+                cursor.execute("""DELETE FROM admins WHERE user_id = %s""", (user[0],))
+
+                #close the cursor
+                cursor.close()
+
+                #commit the changes
+                con.commit()
+
+                #report to the front end
+                return 'success - admin deleted'
+
             #detect an appointment act
             elif form['act'] == 'appointment':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try:
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@311 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 2:
+
+                        #validate the appt_id type
+                        if not isinstance(data[1], int):
+                            return 'Cfailure@739 - invalid appt_id data type'                                 
+
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #delete the appointment
+                        cursor.execute("""DELETE FROM appointments WHERE appt_id = %s""", (data[1]))
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+                    
+                        #report to the front end
+                        return 'success - deleted appointment'
+                    
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect a patient act
             elif form['act'] == 'patient':
 
+                #try to package the 
+                #recieved form data
+                data = None
+                try:
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@311 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+                    
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 1:
+
+                        #validate the patient_id type
+                        if not isinstance(data[0], int) or notin('patient_id', data[0], 'patients', con):
+                            return 'Cfailure@460 - invalid patient_id data type'
+                    
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #delete the patient
+                        cursor.execute("""DELETE FROM patient WHERE patient_id = %s""", (data[0],))
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end
+                        return 'success - deleted patient'
+
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
+
             #detect a medical record act
             elif form['act'] == 'medical_record':
+
+                #try to package the 
+                #recieved form data
+                data = None
+                try:
+                    data = tuple(form['data'])
+                except Exception as e:
+                    print(e)
+                    return 'Cfailure@311 - packaging failure'
+                
+                #handle the recieved data
+                if data != None:
+
+                    #check that the provided 
+                    #patient id is contained within
+                    #the admin's patient list
+                    if data[0] not in patient_list:
+                        return 'Cfailure@324 - patient not bound to admin'
+                    
+                    #check that the proper number
+                    #of parameters have been sent
+                    if len(data) == 2:
+
+                        #validate the record_id
+                        if not isinstance(data[1], int):
+                            return 'Cfailure@1003 - invalid record_id data type'
+
+                        #create a cursor
+                        cursor = con.cursor()
+
+                        #delete the record
+                        cursor.execute(""""DELETE FROM medical_records WHERE record_id = %s""", (data[1],))
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
+
+                        #report to the front end                
+                        return 'success - deleted record'
+                
+                    #detect invalid data format
+                    else:
+                        return 'Cfailure@189 - invalid data format'
+                    
+                #detect invalid data format
+                else:
+                    return 'Cfailure@189 - invalid data format'
 
             #detect an invalid act
             else:
