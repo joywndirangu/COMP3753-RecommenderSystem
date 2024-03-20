@@ -27,23 +27,14 @@ def main():
     
     #start the main application loop
     while 1:
-        
+
         #listen for incoming requests
         form = mon.recv()
-
-        #notify the admin of recieved requests
-        print('----------- qRequest recieved -----------')
+        print(f'main: {form}')
         
         #handle the query forms with con
         #and respond using mon
-        mon.send(con.handle(con, form, sessions))
-        
-        #notify admin of successfully handled form
-        print('form handled')
-            
-        #print a dividing footer 
-        #for the admin's ease of use
-        print('\n')
+        mon.send(connector.handle(con, form, sessions))
 
 #start the backend
 if __name__ == "__main__":

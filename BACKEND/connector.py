@@ -110,6 +110,9 @@ def init():
     
     #close the cursor
     cursor.close()
+
+    #make a commit
+    db.commit()
     
     #return the data base connection
     return db
@@ -128,7 +131,7 @@ def handle(con, form, sessions):
         
         #search for the user's table entry
         cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND password_hash = %s", 
+            "SELECT * FROM users WHERE email = %s AND password = %s", 
             (
                 form['data'][0], 
                 passwordHash
@@ -151,7 +154,8 @@ def handle(con, form, sessions):
         else:
         
             #check if the user is already signed in
-            if authenticate(form, sessions, con) != None:
+            signee = authenticate(form, sessions, con)
+            if signee != None:
             
                 #report that the user is already signed in
                 return 'failure: user already signed in'
@@ -160,13 +164,14 @@ def handle(con, form, sessions):
             else: 
             
                 #package the userID and IP
-                session = createCookie(user)
+                cookie = createCookie(user)
             
                 #add the userID to the users list
-                sessions.append(session)
+                sessions.append(cookie['session'].value)
+                print(sessions)
                 
                 #return the session cookie
-                return session
+                return cookie
 
     #detect a creation form
     elif form['type'] == 'create':
@@ -176,6 +181,14 @@ def handle(con, form, sessions):
         
             #hash the provided password
             passwordHash = hashlib.sha256(form['data'][1].encode()).hexdigest()
+
+            #check that the provided form
+            #date of birth is within the valid
+            #format (YYYY/MM/DD)
+            if not validDate(form['data'][3]):
+
+                #report invalid
+                return 'failure: invalid date of birth format'
         
             #create a cursor
             cursor = con.cursor()
@@ -217,6 +230,9 @@ def handle(con, form, sessions):
            
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
            
                 #report a success
                 return 'success: user created'
@@ -250,6 +266,10 @@ def handle(con, form, sessions):
                 #fetch the user's patient entry
                 cursor.execute('SELECT * FROM patients WHERE userID = %s', (user[0],))
                 patient = cursor.fetchone()
+
+                #detect an invalid date format
+                if not validDatetime(form['data'][2]):
+                    return 'failure: invalid datetime'
                 
                 #insert the appointment
                 cursor.execute(
@@ -271,6 +291,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report a success
                 return 'success: created appointment'
@@ -315,6 +338,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report a success
                 return 'success: created feedback'
@@ -484,6 +510,9 @@ def handle(con, form, sessions):
                     
                     #close the cursor
                     cursor.close()
+
+                    #make a commit
+                    con.commit()
                     
                     #report the update
                     return 'success: updated user'
@@ -542,6 +571,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the update
                 return 'success: updated appointment'
@@ -587,6 +619,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the update
                 return 'success: feedback updated'
@@ -623,10 +658,13 @@ def handle(con, form, sessions):
                 cursor = con.cursor()
             
                 #make the user deletion
-                cursor.execute('DELETE FROM users WHERE userID = %s' (user[0],))
+                cursor.execute('DELETE FROM users WHERE userID = %s', (user[0],))
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the deletion
                 return 'success: user deleted'
@@ -670,6 +708,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
    
                 #report the deletion
                 return 'success: appointment deleted'
@@ -710,6 +751,9 @@ def handle(con, form, sessions):
                 
                 #close the cursor
                 cursor.close()
+
+                #make a commit
+                con.commit()
                 
                 #report the deletion
                 return 'success: feedback deleted'
@@ -731,7 +775,7 @@ def authenticate(form, sessions, con):
     #check that the form cookie 
     #represents a valid session
     if form['cookie'] in sessions:
-        
+
         #create a cursor
         cursor = con.cursor()
         
@@ -772,9 +816,8 @@ def createCookie(user):
     expiry = futureTime.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
     
     #define a session cookie
-    cookie['session'] = user[0]
+    cookie['session'] = str(user[0])
     cookie['session']['path'] = '/'
-    cookie['session']['expires'] = expiry
     cookie['session']['httponly'] = True
     
     #return the cookie
@@ -809,3 +852,31 @@ def vacant(username, cursor):
         return False
     else: 
         return True
+    
+#define a datetime validator function
+def validDatetime(dateString):
+
+    #attempt to parse the string 
+    #using the desired format
+    try:
+        datetime.strptime(dateString, '%Y-%m-%d %H:%M:%S')
+        return True
+    
+    #if parsing fails, the 
+    #format does not match
+    except ValueError:
+        return False
+    
+#define a date validator function
+def validDate(dateString):
+
+    #attempt to parse the date string 
+    #using the expected MySQL date format
+    try:
+        datetime.strptime(dateString, '%Y-%m-%d')
+        return True
+    
+    #parsing failed, the 
+    #format is incorrect
+    except ValueError:
+        return False
