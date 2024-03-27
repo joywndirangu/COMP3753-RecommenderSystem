@@ -75,7 +75,6 @@
                 </div>
             </section>
             <script>
-
                 async function req(type, act, data) {
 
                     try {
@@ -176,6 +175,65 @@
                     }
                 }
 
+                const patients = patients()
+
+                function make_list(ulElement, item) {
+                    let liElement = document.createElement("li");
+                    liElement.textContent = item;
+                    liElement.style.display = "inline-block";
+                    liElement.style.marginRight = "10px";
+                    ulElement.appendChild(liElement);
+                }
+
+                for (let i = 0; i < patients.length; i++) {
+
+                    let divElement = document.createElement("div");
+                    let ulElement = document.createElement("ul");
+
+                    let patient_items = req('retrieve', 'patient', [patients[i]])
+
+                    patient_items.forEach(function(item) {
+                        make_list(ulElement, item);
+                    });
+
+                    divElement.appendChild(ulElement);
+
+                    document.getElementById('patients_container').appendChild(divElement);
+                }
+
+                for (let i = 0; i < patients.length; i++) {
+
+                    let appointments = req('retrieve', 'appointment', [patients[i]]);
+
+                    appointments.forEach(function(appointment_items) {
+
+                        let divElement = document.createElement("div");
+                        let ulElement = document.createElement("ul");
+
+                        appointment_items.forEach(function(item) {
+                            make_list(ulElement, item);
+                        });
+
+                        divElement.appendChild(ulElement);
+                    });
+                }
+
+                for (let i = 0; i < patients.length; i++) {
+                    
+                    let records = req('retrieve', 'medical_record')
+
+                    records.foreach(function(record_items) {
+
+                        let divElement = document.createElement("div");
+                        let ulElement = document.createElement("ul");
+
+                        record_items.forEach(function(item) {
+                            make_list(ulElement, item)
+                        });
+
+                        divElement.appendChild(ulElement);
+                    });
+                }
             </script>
         </main>        
         <footer>
