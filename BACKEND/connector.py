@@ -171,8 +171,8 @@ def handle(form, sessions, con):
                         if not vacant(data[3], cursor):
                             return 'Cfailure@172 - provided email already in use'
                         
-                        #insert the user
-                        cursor.execute("""(     
+                        #insert the admin
+                        cursor.execute("""     
                             INSERT INTO admins (
                                 clinic_id, 
                                 role, 
@@ -181,7 +181,13 @@ def handle(form, sessions, con):
                                 password, 
                                 patients
                                 ) VALUES (%s, %s, %s, %s, %s, %s)
-                        )""", data)
+                        """, data)
+
+                        #close the cursor
+                        cursor.close()
+
+                        #commit the changes
+                        con.commit()
 
                         #report to the front end
                         return 'success - admin created'
@@ -347,8 +353,8 @@ def handle(form, sessions, con):
                         cursor = con.cursor()
 
                         #insert the appointment
-                        cursor.execute("""(     
-                            INSERT INTO admins (
+                        cursor.execute("""     
+                            INSERT INTO appointments (
                                 patient_id, 
                                 appt_type, 
                                 appt_status, 
@@ -389,19 +395,13 @@ def handle(form, sessions, con):
                 #handle the recieved data
                 if data != None:
 
-                    #check that the provided 
-                    #patient id is contained within
-                    #the admin's patient list
-                    if data[0] not in patient_list:
-                        return 'Cfailure@324 - patient not bound to admin'
-
                     #check that the proper number
                     #of parameters have been sent
                     if len(data) == 6:
 
                         #validate the patient name type
                         if not isinstance(data[0], str) or len(data[0]) > 64:
-                            return 'Cfailure@404 - invalid patient_name data type/length'
+                            return 'Cfailure@404 - invalid name data type/length'
                         
                         #validate the sex type
                         if not isinstance(data[1], str) or len(data[1]) > 1:
@@ -429,7 +429,7 @@ def handle(form, sessions, con):
                         #make the insertion
                         cursor.execute(
                             """INSERT INTO patients(
-                                patient_name,
+                                name,
                                 sex,
                                 age,
                                 emerg_contact,
@@ -443,6 +443,11 @@ def handle(form, sessions, con):
                         #the admins patient list
                         cursor.execute("""SELECT LAST_INSERT_ID()""")
                         patient_list.append(cursor.fetchone()[0])
+                        cursor.execute("""
+                            UPDATE admins SET
+                                patients = %s
+                            WHERE user_id = %s
+                        """, (str(patient_list), user[0]))
 
                         #close the cursor
                         cursor.close()
@@ -586,7 +591,7 @@ def handle(form, sessions, con):
 
                         #return the appointments 
                         #to the front end
-                        return tuple(appointments)
+                        return (str(appointments),)
 
                     #detect invalid data format
                     else:
@@ -759,12 +764,12 @@ def handle(form, sessions, con):
                             return 'Cfailure@759 - invalid password data type/length'
                         
                         #validate patients type
-                        if not isinstance(data[5], str) or data[5] != '[]':
+                        if not isinstance(data[5], str):
                             return 'Cfailure@763 - invalid patients data type'
                         
                         #validate user_id type
-                        if not isinstance(data[6], int):
-                            return 'Cfailure@767 - invalid user_id type'
+                        if not isinstance(data[6], int) or user[0] != data[6]:
+                            return 'Cfailure@767 - invalid user_id type/value'
                 
                         #create a cursor
                         cursor = con.cursor()
@@ -774,8 +779,8 @@ def handle(form, sessions, con):
                         if not vacant(data[3], cursor):
                             return 'Cfailure@775 - provided email already in use'
                         
-                        #insert the user
-                        cursor.execute("""(     
+                        #update the admin
+                        cursor.execute("""     
                             UPDATE admins SET
                             clinic_id = %s, 
                             role = %s, 
@@ -789,6 +794,9 @@ def handle(form, sessions, con):
 
                         #close the cursor
                         cursor.close()
+
+                        #commit the changes
+                        con.commit()
 
                         #report to the front end
                         return 'success - admin updated'
@@ -819,7 +827,7 @@ def handle(form, sessions, con):
                     #check that the provided 
                     #patient id is contained within
                     #the admin's patient list
-                    if data[1] not in patient_list:
+                    if data[0] not in patient_list:
                         return 'Cfailure@823 - patient not bound to admin'
 
                     #check that the proper number
@@ -892,15 +900,15 @@ def handle(form, sessions, con):
                 #handle the recieved data
                 if data != None:
 
-                    #check that the provided 
-                    #patient id is contained within
-                    #the admin's patient list
-                    if data[6] not in patient_list:
-                        return 'Cfailure@899 - patient not bound to admin'
-
                     #check that the proper number
                     #of parameters have been sent
                     if len(data) == 7:
+
+                        #check that the provided 
+                        #patient id is contained within
+                        #the admin's patient list
+                        if data[6] not in patient_list:
+                            return 'Cfailure@899 - patient not bound to admin'
 
                         #validate the patient name type
                         if not isinstance(data[0], str) or len(data[0]) > 64:
@@ -936,7 +944,7 @@ def handle(form, sessions, con):
                         #make the update
                         cursor.execute("""
                             UPDATE patients SET
-                            patient_name = %s,
+                            name = %s,
                             sex = %s,
                             age = %s,
                             emerg_contact = %s,
@@ -1044,7 +1052,7 @@ def handle(form, sessions, con):
             if form['act'] == 'admin':
 
                 #end the admin's session
-                sessions.remove(user)
+                sessions.remove(str(user[0]))
 
                 #create a cursor
                 cursor = con.cursor()
@@ -1147,7 +1155,7 @@ def handle(form, sessions, con):
                         cursor = con.cursor()
 
                         #delete the patient
-                        cursor.execute("""DELETE FROM patient WHERE patient_id = %s""", (data[0],))
+                        cursor.execute("""DELETE FROM patients WHERE patient_id = %s""", (data[0],))
 
                         #close the cursor
                         cursor.close()
@@ -1301,7 +1309,7 @@ def endSession(user, sessions):
 def vacant(username, cursor):
 
     #query the database for the username         
-    cursor.execute('SELECT * FROM users WHERE email = %s', (username,))
+    cursor.execute('SELECT * FROM admins WHERE email = %s', (username,))
 
     #process the result
     result = cursor.fetchone()

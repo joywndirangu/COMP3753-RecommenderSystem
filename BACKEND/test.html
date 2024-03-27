@@ -60,67 +60,106 @@
             }
         }
         
-        //user creation test
-        console.log(req('create', 'admin', ['testUser@example.com', 'password', 'test', '2002-10-10']))
+        // //user creation test
+        console.log(req('create', 'admin', [ 
+            1, 
+            'role', 
+            'name', 
+            'testUser@example.com', 
+            'password', 
+            '[]'
+        ]))
 
         //sign in test
-        console.log(req('sign in', null, ['testUser@example.com', 'password']))
+        console.log(req('sign in', null, [
+            'email', 
+            'password'
+        ]))
 
-        // //creation test
-        // function creationTest() {
+        // //create a patient
+        req('create', 'patient', [
+            'patient_name',
+            'm',
+            0,
+            'emerg_contact',
+            0,
+            'address'
+        ])
 
-        //     //create an appointment
-        //     req('create', 'appointment', [1, 'status', 'dateTime'])
+        // //create an appointment
+        console.log(req('create', 'appointment', [
+            1, 
+            'appt_type', 
+            'appt_status', 
+            '2024-10-10 10:10:10'
+        ]))
 
-        //     //create feedback
-        //     req('create', 'feedback', [1, '5', 'test'])
+        // //create a medical record
+        console.log(req('create', 'medical_record', [
+            1,
+            'diagnoses',
+            'med_hist',
+            'medication'
+        ]))
 
-        // }
-        // creationTest()
+        //retrieve admin
+        console.log(req('retrieve', 'admin', null))
 
-        // //retrieval test
-        // function retrievalTest() {
+        //retrieve patient
+        console.log(req('retrieve', 'patient', [2]))
 
-        //     //retrieve a user
-        //     req('retrieve', 'user', null)
+        //retrieve appointments
+        console.log(req('retrieve', 'appointment', [2]))
 
-        //     //retrieve an appointment
-        //     req('retrieve', 'appointment', null)
+        //retrieve medical record
+        console.log(req('retrieve', 'medical_record', [2]))
 
-        //     //retrieve feedback
-        //     req('retrieve', 'feedback', null)
-        // }
-        // retrievalTest()
+        //update admin
+        console.log(req('update', 'admin', [
+            1, 
+            'role', 
+            'updated', 
+            'email', 
+            'password', 
+            '[1, 2]',
+            2
+        ]))
 
-        // //update test
-        // function updateTest() {
+        //update patient
+        console.log(req('update', 'patient', [
+            'name',
+            'm',
+            0,
+            'emerg_contact',
+            0,
+            'updatedaddress',
+            2
+        ]))
 
-        //     //update the user
-        //     req('update', 'user', ['updatedTestUser@example.com', 'updated password'])
+        //update appointment
+        console.log(req('update', 'appointment', [
+            2, 
+            'updated', 
+            'appt_status', 
+            '2024-10-10 7:57:20',
+            1
+        ]))
 
-        //     //update an appointment
-        //     req('update', 'appointment', [1, 'updated status', 'dateTime'])
+        //update medical record
+        console.log(req('update', 'medical_record', [
+            1,
+            'diagnoses',
+            'updated',
+            'medication',
+            1
+        ]))
 
-        //     //update feedback
-        //     req('update', 'feedback', [clinicID, '6', 'updatedtest'])
+        //delete patient
+        console.log(req('delete', 'patient', [1]))
+        console.log(req('delete', 'patient', [2]))
 
-        // }
-        // updateTest()
-
-        // //deletion test
-        // function deleteTest() {
-
-        //     //delete an appointment
-        //     req('delete', 'appointment', [])
-
-        //     //delete feedback
-        //     req('delete', 'feedback', [])
-
-        //     //delete a user
-        //     req('delete', 'user', null)
-
-        // }
-        // deleteTest()
+        //delete admin
+        console.log(req('delete', 'admin', [1]))
 
     </script>
 </body>
