@@ -1,0 +1,118 @@
+body {
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: Trebuchet MS;
+    background-image: url('map.jpeg'); /* Replace 'your-background-image.jpg' with the actual path to your image */
+    background-size: cover; /* This property ensures that the background image covers the entire container */
+    background-position: center; /* This property centers the background image */
+    background-attachment: fixed; /* This property fixes the background image while scrolling */
+}
+
+h1 {
+    color: #018488;
+}
+
+/* header/logo Title */
+header {
+    background-color: #ffffff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+img{
+    width: 100%;
+    height: auto;
+    text-align: center;
+}
+
+/* css for the contact us page form */
+* {box-sizing: border-box;}
+
+.container1 {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+.container2 {
+    border-radius: 2px;
+    border-color: #03989e;
+    border-style: solid;
+    border-width: 1px;
+    background-color: #ffffff;
+    padding: 20px;
+}
+
+/* registration css style */
+/* Add padding to containers */
+.container {
+    padding: 16px;
+    background-color: white;
+  }
+  
+  /* Full-width input fields */
+  input[type=text], input[type=password] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+  }
+  
+  input[type=text]:focus, input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+  }
+  
+  /* Overwrite default styles of hr */
+  hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+  }
+  
+  /* Set a style for the submit button */
+  .registerbtn {
+    background-color: #03989e;
+    color: white;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+  }
+  
+  .registerbtn:hover {
+    opacity: 1;
+  }
+  
+  /* Add a blue text color to links */
+  a {
+    color: dodgerblue;
+  }
+  
+  /* Set a grey background color and center the text of the "sign in" section */
+  .signin {
+    background-color: #f1f1f1;
+    text-align: center;
+  }
+
+  .register {
+    display: none;
+}
+
+/* navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: #03989e;
+}
