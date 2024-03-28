@@ -4,37 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital Locator</title>
-    <!-- styles for map container and search box -->
-    <style>
-        #map {
-            height: 600px;
-            width: 100%;
-            position: relative;
-        }
-
-        #search-box {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-            width: 400px; 
-            max-width: calc(100% - 20px);
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
+    <header>
+        <img src="RSLogo.png" alt="AcadiaPG">
+    </header>
+
+    <div class="navbar">
+        <span id="open-btn" onclick="openNav()">☰</span>
+        <a href="Home.html" class="right">Sign Out</a>
+    </div>
+
+    <div id="sideNav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="patientDB.html">Patients</a>
+        <a href="map.html">Site Finder</a>
+        <a href="contactForm.html">Contact Us</a>
+    </div>
     
+    <main>
     <input id="search-box" type="text" placeholder="Search hospitals for specific treatments">
 
     <div id="map"></div>
 
     <!--Google Maps JavaScript API script with the provided API key -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&libraries=places&callback=initMap" async defer></script>
+
+    </main>
 
     <!-- JavaScript to initialize the map and search box -->
     <script>
@@ -122,6 +119,16 @@
                 center: defaultLocation,
                 zoom: 12 // Set initial zoom level
             });
+        }
+
+        function openNav() {
+            document.getElementById("sideNav").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+        
+        function closeNav() {
+            document.getElementById("sideNav").style.width = "0";
+            document.getElementById("main").style.marginLeft= "0";
         }
     </script>
 </body>
