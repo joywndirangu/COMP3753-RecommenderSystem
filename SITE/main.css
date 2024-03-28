@@ -18,6 +18,11 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+
+header img {
+    height: 170px; /* Adjust the height as needed */
+}
+
 /* used */
 main {
     max-width: 1200px;
