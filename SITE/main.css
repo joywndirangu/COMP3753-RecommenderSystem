@@ -18,6 +18,11 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+
+header img {
+    height: 170px; /* Adjust the height as needed */
+}
+
 /* used */
 main {
     max-width: 1200px;
@@ -133,4 +138,27 @@ input[type=submit]:hover {
     padding: 8px 8px 1px 22px;
     margin-right: 10px;
     color: white;
+}
+
+#map {
+    height: 600px;
+    width: 100%;
+    position: relative;
+}
+
+#search-box {
+    margin-top: 300px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    /* width: 400px;*/
+    width: 100%;
+    /* max-width: calc(100% - 20px); */
+    max-width: 400px;
 }
