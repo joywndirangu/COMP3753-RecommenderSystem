@@ -28,7 +28,7 @@ def init():
     server.start()
     
     #return the parent connection
-    return parentConn
+    return parentConn, server
 
 #handler class factory function
 def makeHTTPRequestHandler(childConn):
@@ -254,5 +254,5 @@ def run(childConn, serverClass=HTTPServer, port=4443):
     httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
 
     #notify the admin of the server starting
-    print(f"Starting HTTPS server on port {port}...")
+    print(f"Starting HTTPS server on port {port}...\n")
     httpd.serve_forever()

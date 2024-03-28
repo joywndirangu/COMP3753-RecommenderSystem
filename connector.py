@@ -98,7 +98,7 @@ def init():
     
     #return the data base connection
     return db
-    
+
 #define a query form handler function
 def handle(form, sessions, con):
 
@@ -280,7 +280,6 @@ def handle(form, sessions, con):
                         
                             #add the userID to the users list
                             sessions.append(cookie['session'].value)
-                            print(sessions)
                             
                             #return the session cookie
                             return cookie
