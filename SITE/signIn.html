@@ -4,11 +4,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sign In</title>
-        <link rel="stylesheet" href="sign.css">
+        <link rel="stylesheet" href="https://localhost:4443/sign.css">
     </head>
     <signinbody>
         <header>
-                <img src="MiniHeader.png" alt="AcadiaPG">
+                <img src="https://localhost:4443/miniHeader.png" alt="AcadiaPG">
         </header>
        
         <div class="navbar">
@@ -24,17 +24,13 @@
                           <h1>Sign In</h1>
                           <p>Please fill in this form to sign into your account.</p>
                           <hr>
-                      
                           <label for="email"><b>Email</b></label>
-                          <input type="text" placeholder="Enter Email" name="email" id="email" required>
-                      
+                          <input type="text" placeholder="Enter Email" name="email" id="sign_email" required>
                           <label for="psw"><b>Password</b></label>
-                          <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                          <input type="password" placeholder="Enter Password" name="psw" id="sign_psw" required>
                           <hr>
-                      
                           <button type="submit" class="registerbtn">Sign In</button>
                         </div>
-
                         <div class="container signin">
                             <p>Don't have an account with us? <a href="#" id="registerlink">Register</a>.</p>
                         </div>
@@ -46,10 +42,10 @@
                             <hr>
                         
                             <label for="email"><b>Email</b></label>
-                            <input type="text" placeholder="Enter Email" name="email" id="email" required>
+                            <input type="text" placeholder="Enter Email" name="email" id="reg_email" required>
                         
                             <label for="psw"><b>Password</b></label>
-                            <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+                            <input type="password" placeholder="Enter Password" name="psw" id="reg_psw" required>
                         
                             <label for="psw-repeat"><b>Repeat Password</b></label>
                             <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
@@ -124,24 +120,50 @@
                 }
             }
 
-            function sign_in(event) {
-
-
+            function sign_in(event, email, psw) {
                 event.preventDefault();
 
-                let response = req('signin', null, [
-                    document.getElementbyId('email').value,
-                    document.getElementsById('psw').value
-                ]);
-
-                if (response == 'success - cookie set successfully') {
-                    window.location = 'https://localhost:4443/patientDB.html'
-                } else {
-                    console.log(response);
-                }
+                req('sign in', null, [
+                    email,
+                    psw
+                ]).then(response => {
+                    if (response === 'success - cookie set successfully') {
+                        window.location.href = 'https://localhost:4443/patientDB.html';
+                    } else {
+                        console.log(response);
+                    }
+                });
             }
 
-            document.getElementById('signin').addEventListener('submit', sign_in)
+            document.getElementById('signin').addEventListener('submit', (event) => {
+                sign_in(
+                    event, 
+                    document.getElementById('sign_email').value, 
+                    document.getElementById('sign_psw').value
+                );
+            });
+
+            function create_admin(event) {
+                event.preventDefault();
+
+                req('create', 'admin', [
+                    1, 
+                    'role', 
+                    'name', 
+                    document.getElementById('reg_email').value,
+                    document.getElementById('reg_psw').value,
+                    '[]'
+                ]).then(response => {
+                    if (response === 'success - admin created') {
+                        sign_in(
+                            event, 
+                            document.getElementById('reg_email').value, 
+                            document.getElementById('reg_psw').value
+                        );
+                    }
+                });
+            }
+            document.getElementById('register').addEventListener('submit', create_admin);
         </script>
     </signinbody>
 </html>

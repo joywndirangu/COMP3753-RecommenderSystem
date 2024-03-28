@@ -8,6 +8,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from multiprocessing import Process, Pipe
 from http.cookies import SimpleCookie
+import mimetypes
 import json
 import ssl
 import os
@@ -155,22 +156,42 @@ def makeHTTPRequestHandler(childConn):
             #find the current working path
             cwd = os.getcwd()
 
-            #serve API test requests
+            #serve html page requests
             if self.path == '/test.html':
                 serve(self, 'SITE/test.html', cwd)
-
-            #serve homepage requests
             elif self.path == '/home.html':
                 serve(self, 'SITE/home.html', cwd)
-
-            #serve signIn requests
             elif self.path == '/signIn.html':
                 serve(self, 'SITE/signIn.html', cwd)
-
-            #serve patientDB requests
             elif self.path == '/patientDB.html':
                 serve(self, 'SITE/patientDB.html', cwd)
+            elif self.path == '/map.html':
+                serve(self, 'SITE/map.html', cwd)
+            elif self.path == '/contactForm.html':
+                serve(self, 'SITE/contactForm.html', cwd)
 
+            #serve style requests
+            elif self.path == '/home.css':
+                serve(self, 'SITE/home.css', cwd)
+            elif self.path == '/main.css':
+                serve(self, 'SITE/main.css', cwd)
+            elif self.path == '/sign.css':
+                serve(self, 'SITE/sign.css', cwd)
+
+            #serve image requests
+            elif self.path == '/home_bckimg.jpeg':
+                serve(self, 'SITE/home_bckimg.jpeg', cwd)
+            elif self.path == '/home_image.jpeg':
+                serve(self, 'SITE/home_image.jpeg', cwd)
+            elif self.path == '/logo.png':
+                serve(self, 'SITE/logo.png', cwd)
+            elif self.path == '/map.jpeg':
+                serve(self, 'SITE/map.jpeg', cwd)
+            elif self.path == '/miniHeader.png':
+                serve(self, 'SITE/miniHeader.png', cwd)
+            elif self.path == '/RSLogo.png':
+                serve(self, 'SITE/RSLogo.png', cwd)
+                
             #for other paths, serve a 404 response
             else:
                 self.send_response(404) 
@@ -184,27 +205,32 @@ def makeHTTPRequestHandler(childConn):
 #define a file serve routine
 def serve(self, rel_path, cwd):
 
-    #path to the test.html file
-    file_path = f'{cwd}{rel_path}'
-    print(file_path)
-    
-    #check if file exists
+    #generate the absolute file path
+    file_path = os.path.join(cwd, rel_path)
+
+    #determine the MIME type of the file
+    mime_type, _ = mimetypes.guess_type(file_path)
+
+    #fallback to 'application/octet-stream' if MIME type is not determined
+    if mime_type is None:
+        mime_type = 'application/octet-stream'
+
+    #check if the file exists
     if os.path.exists(file_path):
 
-        #open the file for reading
+        #open the file for reading in binary mode
         with open(file_path, 'rb') as file:
 
             #set HTTP response headers
             self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Type', mime_type)
             self.end_headers()
             
             #send the content of the file to the client
             self.wfile.write(file.read())
-    else:
 
-        #file not found, set 
-        #response code to 404 (Not Found)
+    #serve a 404 response if the file does not exist
+    else:
         self.send_response(404)
         self.send_header('Content-Type', 'text/plain')
         self.end_headers()
@@ -224,7 +250,7 @@ def run(childConn, serverClass=HTTPServer, port=4443):
     
     #SSL setup
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain('cert.pem', 'key.pem')
+    context.load_cert_chain('SECURITY/cert.pem', 'SECURITY/key.pem')
     httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
 
     #notify the admin of the server starting

@@ -183,28 +183,28 @@ def handle(form, sessions, con):
                                 ) VALUES (%s, %s, %s, %s, %s, %s)
                         """, data)
 
-                        #close the cursor
+                        #close the cursor 
                         cursor.close()
 
-                        #commit the changes
+                        #commit the changes 
                         con.commit()
 
-                        #report to the front end
+                        #report to the front end 
                         return 'success - admin created'
                     
-                    #detect invalid data format
+                    #detect invalid data format 
                     else:
                         return 'Cfailure@191 - invalid data format'
                     
-                #detect invalid data format
+                #detect invalid data format 
                 else:
                     return 'Cfailure@195 - invalid data format'
                 
-            #detect an invalid act
+            #detect an invalid act 
             else:
                 return 'Cfailure@199 - invalid act, no credentials'
         
-        #detect a sign in attempt
+        #detect a sign in attempt 
         elif form['type'] == 'sign in':
 
             #try to hash the provided password
@@ -238,10 +238,10 @@ def handle(form, sessions, con):
                     if not isinstance(data[1], str):
                         return 'Cfailure@233 - invalid password data type'
                     
-                    #create a cursor
+                    #create a cursor 
                     cursor = con.cursor()
                     
-                    #search for the user's table entry
+                    #search for the user's table entry 
                     cursor.execute(
                         "SELECT * FROM admins WHERE email = %s AND password = %s", 
                         (
@@ -250,13 +250,13 @@ def handle(form, sessions, con):
                         )
                     )
                     
-                    #fetch the search results
+                    #fetch the search results 
                     user = cursor.fetchone()
                     
-                    #close the cursor
+                    #close the cursor 
                     cursor.close()
                     
-                    #handle invalid credentials
+                    #handle invalid credentials 
                     if user == None:
                         
                         #report an invalid email password combo
@@ -293,9 +293,9 @@ def handle(form, sessions, con):
             else:
                 return 'Cfailure@288 - invalid data format'
             
-        #detect an invalid format
+        #detect an invalid type
         else:
-            return 'Cfailure@292 - invalid data format'
+            return 'Cfailure@292 - invalid type'
         
     #detect an accredited admin
     #request, perform the specified
@@ -347,7 +347,7 @@ def handle(form, sessions, con):
                         
                         #validate the appt datetime
                         if not validDatetime(data[3]):
-                            return 'Cfailure@344 - invalid appt_date format, expected YYYY-MM-DD-Hrs-Min'
+                            return 'Cfailure@344 - invalid appt_date format, expected %Y-%m-%d %H:%M:%S'
                         
                         #create a cursor
                         cursor = con.cursor()
@@ -583,6 +583,9 @@ def handle(form, sessions, con):
                         appointments = []
                         appointment = cursor.fetchone()
                         while appointment != None:
+                            appointment = list(appointment)
+                            appointment[4] = f'{appointment[4].time()}'
+                            appointment = tuple(appointment)
                             appointments.append(appointment)
                             appointment = cursor.fetchone()
 
@@ -591,7 +594,7 @@ def handle(form, sessions, con):
 
                         #return the appointments 
                         #to the front end
-                        return (str(appointments),)
+                        return tuple(appointments)
 
                     #detect invalid data format
                     else:
@@ -686,7 +689,7 @@ def handle(form, sessions, con):
                         cursor = con.cursor()
 
                         #select the patient's records
-                        cursor.execute("""SELECT * FROM patients WHERE patient_id = %s""", (data[0],))
+                        cursor.execute("""SELECT * FROM medical_records WHERE patient_id = %s""", (data[0],))
 
                         #fetch the query results
                         records = []
@@ -776,8 +779,9 @@ def handle(form, sessions, con):
 
                         #check if the provided email
                         #is already in use
-                        if not vacant(data[3], cursor):
-                            return 'Cfailure@775 - provided email already in use'
+                        if data[3] != user[4]:
+                            if not vacant(data[3], cursor):
+                                return 'Cfailure@775 - provided email already in use'
                         
                         #update the admin
                         cursor.execute("""     
@@ -1156,6 +1160,10 @@ def handle(form, sessions, con):
 
                         #delete the patient
                         cursor.execute("""DELETE FROM patients WHERE patient_id = %s""", (data[0],))
+
+                        #update the admin's patient list
+                        patient_list.remove(data[0])
+                        cursor.execute("""UPDATE admins SET patients = %s WHERE user_id = %s""", (str(patient_list), user[0]))
 
                         #close the cursor
                         cursor.close()

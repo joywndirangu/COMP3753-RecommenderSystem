@@ -4,11 +4,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Medlocator Administration</title>
-        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="https://localhost:4443/main.css">
     </head>
     <body>
         <header>
-                <img src="RSLogo.png" alt="AcadiaPG">
+                <img src="https://localhost:4443/RSLogo.png" alt="AcadiaPG">
         </header>
         <div class="navbar">
             <span id="open-btn" onclick="openNav()">☰</span>
@@ -16,9 +16,9 @@
         </div>
         <div id="sideNav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-            <a href="PatientDB.html">Patients</a>
-            <a href="Map.html">Site Finder</a>
-            <a href="ContactForm.html">Contact Us</a>
+            <a href="https://localhost:4443/patientDB.html">Patients</a>
+            <a href="https://localhost:4443/map.html">Site Finder</a>
+            <a href="https://localhost:4443/contactForm.html">Contact Us</a>
         </div>
         <main>
             <h1>MedLocator Management System</h1>
@@ -47,7 +47,7 @@
                     <input type="number" id="appointment_patient_id" placeholder="Patient ID">
                     <input type="text" id="appointment_type" placeholder="Appointment Type">
                     <input type="text" id="appointment_status" placeholder="Appointment Status">
-                    <input type="datetime-local" id="appointment_datetime" placeholder="Appointment Date & Time">
+                    <input type="text" id="appointment_datetime" placeholder="Appointment Date & Time">
                     <button onclick="create_appointment()">Create Appointment</button>
                 </section>
                 <section id="create_medical_record">
@@ -117,66 +117,6 @@
                     }
                 }
 
-                const admin = req('retrieve', 'admin', null);
-
-                document.getElementById('clinic_id').value = admin[1]
-                document.getElementById('admin_role').value = admin[2]
-                document.getElementById('admin_name').value = admin[3]
-                document.getElementById('admin_email').value = admin[4]
-                document.getElementById('admin_password').value = '**********'
-
-        
-                function update_admin() {
-                    console.log(req('update', 'admin', [
-                        document.getElementById('clinic_id').value,
-                        document.getElementById('admin_role').value,
-                        document.getElementById('admin_name').value,
-                        document.getElementById('admin_email').value,
-                        document.getElementById('admin_password').value
-                    ]))
-                }
-        
-                function create_patient() {
-                    console.log(req('create', 'patient', [
-                        document.getElementById('patient_name').value,
-                        document.getElementById('patient_sex').value,
-                        document.getElementById('patient_age').value,
-                        document.getElementById('emerg_contact').value,
-                        document.getElementById('healthcard_no').value,
-                        document.getElementById('patient_address').value
-                    ]))
-                }
-
-                function create_appointment() {
-                    console.log(req('create', 'appointment', [
-                        document.getElementById('appointment_patient_id').value,
-                        document.getElementById('appointment_type').value,
-                        document.getElementById('appointment_status').value,
-                        document.getElementById('appointment_datetime').value
-                    ]))
-                }
-
-                function create_medical_record() {
-                    console.log(req('create', 'medical_record', [
-                        document.getElementById('record_patient_id').value,
-                        document.getElementById('diagnoses').value,
-                        document.getElementById('med_hist').value,
-                        document.getElementById('medication').value
-                    ]))
-                }
-
-                function patients() {
-                    try{
-                        var patient_list = JSON.loads(admin[6]);
-                        return patient_list;
-                    } catch (error) {
-                        console.error('failed to parse patient list: ', error);
-                        return null;
-                    }
-                }
-
-                const patients = patients()
-
                 function make_list(ulElement, item) {
                     let liElement = document.createElement("li");
                     liElement.textContent = item;
@@ -185,54 +125,163 @@
                     ulElement.appendChild(liElement);
                 }
 
-                for (let i = 0; i < patients.length; i++) {
+                req('retrieve', 'admin', null).then(admin => {
 
-                    let divElement = document.createElement("div");
-                    let ulElement = document.createElement("ul");
+                    document.getElementById('clinic_id').value = admin[1]
+                    document.getElementById('admin_role').value = admin[2]
+                    document.getElementById('admin_name').value = admin[3]
+                    document.getElementById('admin_email').value = admin[4]
+                    document.getElementById('admin_password').value = '**********'
 
-                    let patient_items = req('retrieve', 'patient', [patients[i]])
+                    try{
 
-                    patient_items.forEach(function(item) {
-                        make_list(ulElement, item);
-                    });
+                        const pnts = JSON.parse(admin[6]);
 
-                    divElement.appendChild(ulElement);
+                        for (let i = 0; i < pnts.length; i++) {
 
-                    document.getElementById('patients_container').appendChild(divElement);
-                }
+                            let divElement = document.createElement('div');
+                            let ulElement = document.createElement('ul');
 
-                for (let i = 0; i < patients.length; i++) {
+                            req('retrieve', 'patient', [pnts[i]]).then(patient_items => {
+                                patient_items.forEach(function(item) {
+                                    make_list(ulElement, item);
+                                });
 
-                    let appointments = req('retrieve', 'appointment', [patients[i]]);
+                                let deleteElementButton = document.createElement('button');
+                                
+                                deleteElementButton.onclick = function() {
+                                    req('delete', 'patient', [pnts[i]]).then(function(){
+                                        location.reload(true);
+                                    });
+                                };
 
-                    appointments.forEach(function(appointment_items) {
+                                ulElement.appendChild(deleteElementButton);
 
-                        let divElement = document.createElement("div");
-                        let ulElement = document.createElement("ul");
+                                deleteElementButton.style.backgroundColor = 'red';
+                                deleteElementButton.style.color = 'white';
+                                deleteElementButton.textContent = 'X';
+                                deleteElementButton.style.display = 'inline-block';
 
-                        appointment_items.forEach(function(item) {
-                            make_list(ulElement, item);
-                        });
+                                divElement.appendChild(ulElement);
+                                document.getElementById('patients_container').appendChild(divElement);
+                            });
+                        }
 
-                        divElement.appendChild(ulElement);
-                    });
-                }
+                        for (let i = 0; i < pnts.length; i++) {
 
-                for (let i = 0; i < patients.length; i++) {
+                            req('retrieve', 'appointment', [pnts[i]]).then(appointments => {
+
+                                appointments.forEach(function(appointment_items) {
+
+                                    let divElement = document.createElement("div");
+                                    let ulElement = document.createElement("ul");
+
+                                    appointment_items.forEach(function(item) {
+                                        make_list(ulElement, item);
+                                    });
+
+                                    let deleteElementButton = document.createElement('button');
+                                
+                                    deleteElementButton.onclick = function() {
+                                        req('delete', 'patient', [pnts[i]]).then(function(){
+                                            location.reload(true);
+                                        });
+                                    };
+
+                                    ulElement.appendChild(deleteElementButton);
+
+                                    deleteElementButton.style.backgroundColor = 'red';
+                                    deleteElementButton.style.color = 'white';
+                                    deleteElementButton.textContent = 'X';
+                                    deleteElementButton.style.display = 'inline-block';
+
+                                    divElement.appendChild(ulElement);
+                                    document.getElementById('appointments_container').appendChild(divElement);
+
+                                });
+                            });
+                        }
+
+                        for (let i = 0; i < pnts.length; i++) {
                     
-                    let records = req('retrieve', 'medical_record')
+                            req('retrieve', 'medical_record', [pnts[i]]).then(records => {
 
-                    records.foreach(function(record_items) {
+                                records.forEach(function(record_items) {
 
-                        let divElement = document.createElement("div");
-                        let ulElement = document.createElement("ul");
+                                    let divElement = document.createElement("div");
+                                    let ulElement = document.createElement("ul");
 
-                        record_items.forEach(function(item) {
-                            make_list(ulElement, item)
-                        });
+                                    record_items.forEach(function(item) {
+                                        make_list(ulElement, item)
+                                    });
 
-                        divElement.appendChild(ulElement);
+                                    let deleteElementButton = document.createElement('button');
+                                
+                                    deleteElementButton.onclick = function() {
+                                        req('delete', 'patient', [pnts[i]]).then(function(){
+                                            location.reload(true);
+                                        });
+                                    };
+
+                                    ulElement.appendChild(deleteElementButton);
+
+                                    deleteElementButton.style.backgroundColor = 'red';
+                                    deleteElementButton.style.color = 'white';
+                                    deleteElementButton.textContent = 'X';
+                                    deleteElementButton.style.display = 'inline-block';
+
+                                    divElement.appendChild(ulElement);
+                                    document.getElementById('medical_records_container').appendChild(divElement);
+                                });
+                            });
+                        }
+                    } catch (error) {
+
+                        console.error('failed to parse patient list: ', error);
+                    }
+                });
+        
+                function update_admin() {
+                    req('retrieve', 'admin', null).then(admin => {
+                        console.log(req('update', 'admin', [
+                            parseInt(document.getElementById('clinic_id').value),
+                            document.getElementById('admin_role').value,
+                            document.getElementById('admin_name').value,
+                            document.getElementById('admin_email').value,
+                            document.getElementById('admin_password').value,
+                            admin[6],
+                            admin[0]
+                        ]));
                     });
+                }
+        
+                function create_patient() {
+                    console.log(req('create', 'patient', [
+                        document.getElementById('patient_name').value,
+                        document.getElementById('patient_sex').value,
+                        parseInt(document.getElementById('patient_age').value),
+                        document.getElementById('emerg_contact').value,
+                        parseInt(document.getElementById('healthcard_no').value),
+                        document.getElementById('patient_address').value
+                    ]));
+                }
+
+                function create_appointment() {
+                    console.log(req('create', 'appointment', [
+                        parseInt(document.getElementById('appointment_patient_id').value),
+                        document.getElementById('appointment_type').value,
+                        document.getElementById('appointment_status').value,
+                        document.getElementById('appointment_datetime').value
+                    ]));
+                }
+
+                function create_medical_record() {
+                    console.log(req('create', 'medical_record', [
+                        parseInt(document.getElementById('record_patient_id').value),
+                        document.getElementById('diagnoses').value,
+                        document.getElementById('med_hist').value,
+                        document.getElementById('medication').value
+                    ]));
                 }
             </script>
         </main>        

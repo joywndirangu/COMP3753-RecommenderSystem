@@ -3,10 +3,10 @@ body {
     margin: 0;
     padding: 0;
     font-family: Trebuchet MS;
-    background-image: url('map.jpeg'); /* Replace 'your-background-image.jpg' with the actual path to your image */
-    background-size: cover; /* This property ensures that the background image covers the entire container */
-    background-position: center; /* This property centers the background image */
-    background-attachment: fixed; /* This property fixes the background image while scrolling */
+    background-image: url('https://localhost:4443/map.jpeg'); 
+    background-size: cover;
+    background-position: center; 
+    background-attachment: fixed; 
 }
 
 h1 {
