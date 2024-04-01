@@ -4,11 +4,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sign In</title>
-        <link rel="stylesheet" href="https://localhost:4443/sign.css">
+        <link rel="stylesheet" href="sign.css">
     </head>
     <signinbody>
         <header>
-                <img src="https://localhost:4443/miniHeader.png" alt="AcadiaPG">
+                <img src="miniHeader.png" alt="AcadiaPG">
         </header>
        
         <div class="navbar">
@@ -43,6 +43,15 @@
                         
                             <label for="email"><b>Email</b></label>
                             <input type="text" placeholder="Enter Email" name="email" id="reg_email" required>
+
+                            <label for="role"><b>Role</b></label>
+                            <br>
+                            <!-- <input type="text" placeholder="Enter Your Role" name="email" id="reg_email" required> -->
+                            <select id="role" name="role">
+                                <option value="Admin">Administrator</option>
+                                <option value="HP">Healthcare Professional</option>
+                            </select>
+                            <br><br>
                         
                             <label for="psw"><b>Password</b></label>
                             <input type="password" placeholder="Enter Password" name="psw" id="reg_psw" required>
