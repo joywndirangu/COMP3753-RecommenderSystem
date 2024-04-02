@@ -29,7 +29,7 @@
                           <label for="psw"><b>Password</b></label>
                           <input type="password" placeholder="Enter Password" name="psw" id="sign_psw" required>
                           <hr>
-                          <button type="submit" class="registerbtn">Sign In</button>
+                          <button type="submit" class="registerbtn" onclick="sign_in(event, document.getElementById('sign_email').value, document.getElementById('sign_psw').value)">Sign In</button>
                         </div>
                         <div class="container signin">
                             <p>Don't have an account with us? <a href="#" id="registerlink">Register</a>.</p>
@@ -61,7 +61,7 @@
                             <hr>
                             <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
                         
-                            <button type="submit" class="registerbtn">Register</button>
+                            <button type="submit" class="registerbtn" onclick="create_admin()">Register</button>
                           </div>
                           
                           <div class="container signin">

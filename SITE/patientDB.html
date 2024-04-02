@@ -17,7 +17,7 @@
         </div>
         <div id="sideNav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-            <a href="patientDB.html">Management</a>
+            <a href="patientDB.html">Record Management</a>
             <a href="index.html">Site Finder</a>
             <a href="contactForm.html">Contact Us</a>
         </div>
@@ -29,11 +29,11 @@
                         <p>To update your account:</p>
                         <button id="account_btn" class="btn" onclick="toggleForms('update_acct')">Update Account</button>
                         <p>To create, update, delete or view a patient record:</p>
-                        <button id="patient_btn" class="btn" onclick="toggleForms('create_pt')">Patient Records</button>
+                        <button id="patient_btn" class="btn" onclick="redirectToPatients()">Patient Records</button>
                         <p>To create, update, delete or view a patient appointment:</p>
-                        <button id="appt_btn" class="btn" onclick="toggleForms('create_appt')">Appointments</button>
+                        <button id="appt_btn" class="btn" onclick="redirectToAppt()">Appointments</button>
                         <p>To create, update, delete or view a patient medical record:</p>
-                        <button id="record_btn" class="btn" onclick="toggleForms('create_medrec')">Medical Records</button>
+                        <button id="record_btn" class="btn" onclick="redirectToMedRec()">Medical Records</button>
                     </div>
                 </div>
             <form id="update_acct" class="update_acct">
@@ -42,124 +42,23 @@
                         <section id="update_admin">
                             <h2>Your Account</h2>
                             <p>Update your account below:</p>
-                            <label for="name"><b>Clinic ID</b></label>
-                            <input type="number" id="clinic_id" placeholder="Clinic ID">
-                            <br><br>
-                            <label for="name"><b>Role</b></label>
-                            <input type="text" id="admin_role" placeholder="Role">
+                            <label for="clinicID"><b>Clinic ID</b></label>
+                            <input type="number" id="clinic_id" placeholder="Clinic ID" required>
+                            <label for="role"><b>Role</b></label>
+                            <input type="text" id="admin_role" placeholder="Role" required>
                             <label for="name"><b>Name</b></label>
-                            <input type="text" id="admin_name" placeholder="Name">
-                            <label for="name"><b>Email</b></label>
-                            <input type="text" id="admin_email" placeholder="Email">
-                            <label for="name"><b>Password</b></label>
-                            <input type="password" id="admin_password" placeholder="Password">
+                            <input type="text" id="admin_name" placeholder="Name" required>
+                            <label for="email"><b>Email</b></label>
+                            <input type="text" id="admin_email" placeholder="Email" required>
+                            <label for="old_pass"><b>Old Password</b></label>
+                            <input type="password" id="admin_old_password" placeholder="Password" required>
+                            <label for="new_pass"><b>New Password</b></label>
+                            <input type="password" id="admin_new_password" placeholder="Password" required>
                             <button onclick="update_admin()" class="btn">Update Admin</button>
                         </section>
                     </div>
                 </div>
             </form>
-            <form id="create_pt" class="create_pt">
-                <div class="container1">
-                    <div class="container2">
-                        <div class="container">
-                            <section id="create_patient">
-                                <h2>Create Patient</h2>
-                                <p>Please fill in this form to create a patient.</p>
-                                <label for="name"><b>Name</b></label>
-                                <input type="text" id="patient_name" placeholder="Name" name="name" required>
-                                <label for="sex"><b>Sex</b></label>
-                                <input type="text" id="patient_sex" placeholder="Sex (M/F)" name="sex" required>
-                                <label for="age"><b>Age</b></label>
-                                <input type="number" id="patient_age" placeholder="Age" name="age" required>
-                                <br><br>
-                                <label for="emg_contact"><b>Emergency Contact Details</b></label>
-                                <input type="text" id="emerg_contact" placeholder="Emergency Contact" name="emg_contact" required>
-                                <label for="health_number"><b>Healthcard Number</b></label>
-                                <input type="number" id="healthcard_no" placeholder="Healthcard Number" name="health_number" required>
-                                <br><br>
-                                <label for="address"><b>Patient Address</b></label>
-                                <input type="text" id="patient_address" placeholder="Address" name="address" required>
-                                <button onclick="create_patient()" class="btn">Create Patient</button>
-                            </section>
-                        </div>
-                        <section id="patients_section">
-                            <h2>Patients</h2>
-                            <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </form>
-            <form id="create_appt" class="create_appt">
-                <div class="container1">
-                    <div class="container2">
-                        <div class="container">
-                            <section id="create_appointment">
-                                <h2>Create Appointment</h2>
-                                <p>Please fill in this form to create an appointment.</p>
-                                <label for="patient_id"><b>Patient ID</b></label>
-                                <input type="number" id="appointment_patient_id" placeholder="Patient ID" name="patient_id" required>
-                                <br><br>
-                                <label for="appt_type"><b>Type</b></label>
-                                <input type="text" id="appointment_type" placeholder="Appointment Type" name="appt_type" required>
-                                <label for="appt_status"><b>Status</b></label>
-                                <input type="text" id="appointment_status" placeholder="Appointment Status" name="appt_status" required>
-                                <label for="appt_datetime"><b>Date & Time</b></label>
-                                <input type="text" id="appointment_datetime" placeholder="Appointment Date & Time (24:00 dd/mm/yyyy)" name="appt_datetime" required>
-                                <button onclick="create_appointment()" class="btn">Create Appointment</button>
-                            </section>
-                        </div>
-                        <section id="appointments_section">
-                            <h2>Appointments</h2>
-                            <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </form>
-            <form id="create_medrec" class="create_medrec">
-                <div class="container1">
-                    <div class="container2">
-                        <div class="container">
-                            <section id="create_medical_record">
-                                <h2>Create Medical Record</h2>
-                                <p>Please fill in this form to create a medical record.</p>
-                                <label for="patient_id"><b>Patient ID</b></label>
-                                <input type="number" id="record_patient_id" placeholder="Patient ID" name="patient_id" required>
-                                <br><br>
-                                <label for="diagnoses"><b>Diagnoses</b></label>
-                                <textarea id="diagnoses" placeholder="Diagnoses" name="diagnoses"></textarea>
-                                <label for="med_hist"><b>Medical History</b></label>
-                                <textarea id="med_hist" placeholder="Medical History" name="med_hist"></textarea>
-                                <label for="meds"><b>Medications</b></label>
-                                <textarea id="medication" placeholder="Medication" name="meds"></textarea>
-                                <button onclick="create_medical_record()" class="btn">Create Medical Record</button>
-                            </section>
-                        </div>
-                        <section id="medical_records_section">
-                            <h2>Medical Records</h2>
-                            <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </form>
-                                                   
-                    <!-- <section id="patients_section">
-                        <h2>Patients</h2>
-                        <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                        </div>
-                    </section> -->
-                    <!-- <section id="appointments_section">
-                        <h2>Appointments</h2>
-                        <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                        </div>
-                    </section> -->
-                    <!-- <section id="medical_records_section">
-                        <h2>Medical Records</h2>
-                        <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                        </div>
-                    </section> -->
         </main>        
         <footer>
             <div class="footer">
@@ -190,6 +89,19 @@
                         form.style.display = 'none';
                     }
                 });
+            }
+
+            
+            function redirectToAppt() {
+                window.location.href = 'appt_rec.html';
+            }
+
+            function redirectToPatients() {
+                window.location.href = 'patient_rec.html';
+            }
+
+            function redirectToMedRec() {
+                window.location.href = 'med_rec.html';
             }
 
             async function req(type, act, data) {
@@ -365,6 +277,8 @@
                         document.getElementById('admin_name').value,
                         document.getElementById('admin_email').value,
                         document.getElementById('admin_password').value,
+                        // document.getElementById('admin_old_password').value,
+                        // document.getElementById('admin_new_password').value,
                         admin[6],
                         admin[0]
                     ]));

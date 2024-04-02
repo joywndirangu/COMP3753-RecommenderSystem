@@ -90,6 +90,39 @@ input[type=text], select, textarea {
   resize: vertical;
 }
 
+input[type=tel], select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+
+input[type=number], select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+
+input[type=datetime-local], select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+  }
+
 input[type=submit] {
   background-color: #000000;
   color: white;
@@ -229,17 +262,5 @@ input[type=submit]:hover {
 }
 
 .update_acct {
-    display: none;
-}
-
-.create_pt {
-    display: none;
-}
-
-.create_appt {
-    display: none;
-}
-
-.create_medrec {
     display: none;
 }
