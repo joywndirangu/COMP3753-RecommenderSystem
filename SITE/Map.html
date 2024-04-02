@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Search</title>
+</head>
+<body>
+    <h1>Find Nearest Clinic</h1>
+    <form id="clinicForm">
+        <label for="reason">Reason for Visit:</label>
+        <input type="text" id="reason" name="reason" placeholder="Enter reason for visit">
+
+        <label for="postal_code">Postal Code:</label>
+        <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code">
+
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('clinicForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var postalCode = document.getElementById('postal_code').value.toUpperCase();
+            var reason = document.getElementById('reason').value.toLowerCase();
+
+            var clinics = [
+                ["Clinic A", ["cold", "flu"], "B4P2R2"],
+                ["Clinic B", ["broken bone", "sprain"], "C2T1A3"],
+                ["Clinic C", ["headache", "migraine"], "D1E4F5"],
+                ["Clinic D", ["cold", "flu"], "E5G3H2"],
+                ["Clinic E", ["broken bone", "sprain"], "F6I7J8"],
+                ["Clinic F", ["headache", "migraine"], "G9K1L2"],
+                ["Clinic G", ["cold", "flu"], "H3M4N5"],
+                ["Clinic H", ["broken bone", "sprain"], "I6O7P8"]
+            ];
+
+            var matchingClinics = [];
+
+            for (var i = 0; i < clinics.length; i++) {
+                var clinic = clinics[i];
+                var clinicName = clinic[0];
+                var clinicReasons = clinic[1];
+                var clinicPostalCode = clinic[2];
+
+                if (clinicReasons.includes(reason) && postalCode.substring(0, 3) === clinicPostalCode.substring(0, 3)) {
+                    matchingClinics.push(clinicName);
+                }
+            }
+
+            if (matchingClinics.length > 0) {
+                displayResults(matchingClinics);
+            } else {
+                displayNoResults();
+            }
+        });
+
+        function displayResults(clinics) {
+            var resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>Available Clinics</h2><ul>';
+
+            clinics.forEach(function(clinic) {
+                resultsDiv.innerHTML += '<li>' + clinic + '</li>';
+            });
+
+            resultsDiv.innerHTML += '</ul>';
+        }
+
+        function displayNoResults() {
+            var resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>No clinics available for your visit.</p>';
+        }
+    </script>
+</body>
+</html>
