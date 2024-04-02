@@ -256,7 +256,7 @@
 </head>
 <body>
     <header>
-        <img src="RSLogo.png" alt="AcadiaPG">
+        <img src="COMP3753-RecommenderSystem/SITE/templates/RSLogo.png" alt="AcadiaPG">
     </header>
     <div class="navbar">
         <span id="open-btn" onclick="openNav()">☰</span>
@@ -273,7 +273,7 @@
     <div class="container1">
         <div class="container2">
             <div class="container">
-                <h1>Find The Nearest Clinic</h1>
+                <h2>Find The Nearest Clinic</h2>
                 <form id="clinicForm">
                     <label for="reason">Reason for Visit:</label>
                     <input type="text" id="reason" name="reason" placeholder="Enter reason for visit">
@@ -281,14 +281,14 @@
                     <label for="postal_code">Postal Code:</label>
                     <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code">
 
-                    <button type="submit" class="btn">Search</button>
+                    <button type="submit" class="btn" onclick="searchClinics()">Search</button>
                 </form>
 
-                <div id="results"></div>
             </div>
         </div>
+        <div id="results"></div>
     </div>
-    </main>
+</main>
 
     <script>
         function openNav() {
@@ -301,33 +301,35 @@
                 document.getElementById("main").style.marginLeft= "0";
             }
             
-        $(document).ready(function() {
-            $('#clinicForm').submit(function(event) {
-                event.preventDefault();
-                var formData = $(this).serialize();
-                $.ajax({
-                    type: 'POST',
-                    url: '/search',
-                    data: formData,
-                    success: function(response) {
-                        var clinics = response.clinics;
-                        var resultsHtml = '<h2>Available Clinics</h2><ul>';
-                        if (clinics.length > 0) {
-                            for (var i = 0; i < clinics.length; i++) {
-                                resultsHtml += '<li>' + clinics[i] + '</li>';
-                            }
-                        } else {
-                            resultsHtml += '<li>No clinics available for your visit.</li>';
+        function searchClinics() {
+            event.preventDefault();
+            var reason = document.getElementById("reason").value;
+            var postalCode = document.getElementById("postal_code").value;
+            var formData = { 'postal_code': postalCode, 'reason': reason };
+
+            // Perform AJAX request to search for clinics
+            $.ajax({
+                type: 'POST',
+                url: '/search', // You can change this to the appropriate URL if needed
+                data: formData,
+                success: function(response) {
+                    var clinics = response.clinics;
+                    var resultsHtml = '<h2>Available Clinics</h2><ul>';
+                    if (clinics.length > 0) {
+                        for (var i = 0; i < clinics.length; i++) {
+                            resultsHtml += '<li>' + clinics[i] + '</li>';
                         }
-                        resultsHtml += '</ul>';
-                        $('#results').html(resultsHtml);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
+                    } else {
+                        resultsHtml += '<li>No clinics available for your visit.</li>';
                     }
-                });
+                    resultsHtml += '</ul>';
+                    $('#results').html(resultsHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
             });
-        });
+        }
     </script>
 </body>
 </html>
