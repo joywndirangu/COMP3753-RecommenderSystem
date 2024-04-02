@@ -1,77 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinic Search</title>
-</head>
-<body>
-    <h1>Find Nearest Clinic</h1>
-    <form id="clinicForm">
-        <label for="reason">Reason for Visit:</label>
-        <input type="text" id="reason" name="reason" placeholder="Enter reason for visit">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Clinic Search</title>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <header>
+            <img src="RSLogo.png" alt="AcadiaPG">
+        </header>
+        <div class="navbar">
+            <span id="open-btn" onclick="openNav()">☰</span>
+            <a href="Home.html" class="right">Sign Out</a>
+        </div>
+        <div id="sideNav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+            <a href="patientDB.html">Record Management</a>
+            <a href="index.html">Site Finder</a>
+            <a href="contactForm.html">Contact Us</a>
+        </div>
 
-        <label for="postal_code">Postal Code:</label>
-        <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code">
 
-        <button type="submit">Search</button>
-    </form>
+        <main>
+            <div class="container1">
+                <div class="container2">
+                    <div class="container">
+                        <h1>Find Nearest Clinic</h1>
+                        <form id="clinicForm">
+                            <label for="reason">Reason for Visit:</label>
+                            <input type="text" id="reason" name="reason" placeholder="Enter reason for visit">
 
-    <div id="results"></div>
+                            <label for="postal_code">Postal Code:</label>
+                            <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code">
 
-    <script>
-        document.getElementById('clinicForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+                            <button type="submit">Search</button>
+                        </form>
 
-            var postalCode = document.getElementById('postal_code').value.toUpperCase();
-            var reason = document.getElementById('reason').value.toLowerCase();
+                        <div id="results"></div>
 
-            var clinics = [
-                ["Clinic A", ["cold", "flu"], "B4P2R2"],
-                ["Clinic B", ["broken bone", "sprain"], "C2T1A3"],
-                ["Clinic C", ["headache", "migraine"], "D1E4F5"],
-                ["Clinic D", ["cold", "flu"], "E5G3H2"],
-                ["Clinic E", ["broken bone", "sprain"], "F6I7J8"],
-                ["Clinic F", ["headache", "migraine"], "G9K1L2"],
-                ["Clinic G", ["cold", "flu"], "H3M4N5"],
-                ["Clinic H", ["broken bone", "sprain"], "I6O7P8"]
-            ];
+                    </div>
+                </div>
+            </div>
+        </main>
 
-            var matchingClinics = [];
-
-            for (var i = 0; i < clinics.length; i++) {
-                var clinic = clinics[i];
-                var clinicName = clinic[0];
-                var clinicReasons = clinic[1];
-                var clinicPostalCode = clinic[2];
-
-                if (clinicReasons.includes(reason) && postalCode.substring(0, 3) === clinicPostalCode.substring(0, 3)) {
-                    matchingClinics.push(clinicName);
+        <script>
+            function openNav() {
+                    document.getElementById("sideNav").style.width = "250px";
+                    document.getElementById("main").style.marginLeft = "250px";
                 }
+            
+            function closeNav() {
+                document.getElementById("sideNav").style.width = "0";
+                document.getElementById("main").style.marginLeft= "0";
             }
 
-            if (matchingClinics.length > 0) {
-                displayResults(matchingClinics);
-            } else {
-                displayNoResults();
-            }
-        });
+            document.getElementById('clinicForm').addEventListener('submit', function(event) {
+                event.preventDefault();
 
-        function displayResults(clinics) {
-            var resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<h2>Available Clinics</h2><ul>';
+                var postalCode = document.getElementById('postal_code').value.toUpperCase();
+                var reason = document.getElementById('reason').value.toLowerCase();
 
-            clinics.forEach(function(clinic) {
-                resultsDiv.innerHTML += '<li>' + clinic + '</li>';
+                var clinics = [
+                    ["Clinic A", ["cold", "flu"], "B4P2R2"],
+                    ["Clinic B", ["broken bone", "sprain"], "C2T1A3"],
+                    ["Clinic C", ["headache", "migraine"], "D1E4F5"],
+                    ["Clinic D", ["cold", "flu"], "E5G3H2"],
+                    ["Clinic E", ["broken bone", "sprain"], "F6I7J8"],
+                    ["Clinic F", ["headache", "migraine"], "G9K1L2"],
+                    ["Clinic G", ["cold", "flu"], "H3M4N5"],
+                    ["Clinic H", ["broken bone", "sprain"], "I6O7P8"]
+                ];
+
+                var matchingClinics = [];
+
+                for (var i = 0; i < clinics.length; i++) {
+                    var clinic = clinics[i];
+                    var clinicName = clinic[0];
+                    var clinicReasons = clinic[1];
+                    var clinicPostalCode = clinic[2];
+
+                    if (clinicReasons.includes(reason) && postalCode.substring(0, 3) === clinicPostalCode.substring(0, 3)) {
+                        matchingClinics.push(clinicName);
+                    }
+                }
+
+                if (matchingClinics.length > 0) {
+                    displayResults(matchingClinics);
+                } else {
+                    displayNoResults();
+                }
             });
 
-            resultsDiv.innerHTML += '</ul>';
-        }
+            function displayResults(clinics) {
+                var resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '<h2>Available Clinics</h2><ul>';
 
-        function displayNoResults() {
-            var resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<p>No clinics available for your visit.</p>';
-        }
-    </script>
-</body>
+                clinics.forEach(function(clinic) {
+                    resultsDiv.innerHTML += '<li>' + clinic + '</li>';
+                });
+
+                resultsDiv.innerHTML += '</ul>';
+            }
+
+            function displayNoResults() {
+                var resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '<p>No clinics available for your visit.</p>';
+            }
+        </script>
+    </body>
 </html>
