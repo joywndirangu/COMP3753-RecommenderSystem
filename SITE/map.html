@@ -3,133 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Locator</title>
+    <title>Clinic Search</title>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <header>
         <img src="RSLogo.png" alt="AcadiaPG">
     </header>
-
     <div class="navbar">
         <span id="open-btn" onclick="openNav()">☰</span>
         <a href="Home.html" class="right">Sign Out</a>
     </div>
-
     <div id="sideNav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="patientDB.html">Patients</a>
+        <a href="patientDB.html">Management</a>
         <a href="map.html">Site Finder</a>
         <a href="contactForm.html">Contact Us</a>
     </div>
-    
+
     <main>
-    <input id="search-box" type="text" placeholder="Search hospitals for specific treatments">
+    <div class="container1">
+        <div class="container2">
+            <div class="container">
+                <h1>Find The Nearest Clinic</h1>
+                <form id="clinicForm">
+                    <label for="reason">Reason for Visit:</label>
+                    <input type="text" id="reason" name="reason" placeholder="Enter reason for visit">
 
-    <div id="map"></div>
+                    <label for="postal_code">Postal Code:</label>
+                    <input type="text" id="postal_code" name="postal_code" placeholder="Enter postal code">
 
-    <!--Google Maps JavaScript API script with the provided API key -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlCchRL33sQnmFDfRvH5MGTFT1GWc4R3I&libraries=places&callback=initMap" async defer></script>
+                    <button type="submit" class="btn">Search</button>
+                </form>
 
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
     </main>
 
-    <!-- JavaScript to initialize the map and search box -->
     <script>
-        var map;
-        var markers = [];
-
-        function initMap() {
-            // Try HTML5 geolocation to get the user's current location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-
-                    // Create a new map object centered at the user's location
-                    map = new google.maps.Map(document.getElementById("map"), {
-                        center: userLocation,
-                        zoom: 12 
-                    });
-
-                    // Create a search box and link it to the UI element
-                    var input = document.getElementById("search-box");
-                    var searchBox = new google.maps.places.SearchBox(input);
-
-                    // Bias the search results to the current map's viewport
-                    map.addListener("bounds_changed", function() {
-                        searchBox.setBounds(map.getBounds());
-                    });
-
-                    // Listen for the event fired when the user selects a prediction and retrieve
-                    // more details for that place.
-                    searchBox.addListener("places_changed", function() {
-                        var places = searchBox.getPlaces();
-
-                        if (places.length == 0) {
-                            return;
-                        }
-
-                        // Clear out the old markers.
-                        markers.forEach(function(marker) {
-                            marker.setMap(null);
-                        });
-                        markers = [];
-
-                        // For each place, get the icon, name and location.
-                        var bounds = new google.maps.LatLngBounds();
-                        places.forEach(function(place) {
-                            if (!place.geometry) {
-                                console.log("Returned place contains no geometry");
-                                return;
-                            }
-
-                            // Create a marker for the hospital.
-                            markers.push(new google.maps.Marker({
-                                map: map,
-                                title: place.name,
-                                position: place.geometry.location
-                            }));
-
-                            if (place.geometry.viewport) {
-                                // Only geocodes have viewport.
-                                bounds.union(place.geometry.viewport);
-                            } else {
-                                bounds.extend(place.geometry.location);
-                            }
-                        });
-                        map.fitBounds(bounds);
-                    });
-                }, function() {
-                    handleLocationError(true, map.getCenter());
-                });
-            } else {
-                // Browser doesn't support Geolocation
-                handleLocationError(false, map.getCenter());
-            }
-        }
-
-        function handleLocationError(browserHasGeolocation, pos) {
-            alert(browserHasGeolocation ?
-                            'Error: The Geolocation service failed.' :
-                            'Error: Your browser doesn\'t support geolocation.');
-            var defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Set a default location (e.g., San Francisco, CA)
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: defaultLocation,
-                zoom: 12 // Set initial zoom level
-            });
-        }
-
         function openNav() {
-            document.getElementById("sideNav").style.width = "250px";
-            document.getElementById("main").style.marginLeft = "250px";
-        }
+                document.getElementById("sideNav").style.width = "250px";
+                document.getElementById("main").style.marginLeft = "250px";
+            }
         
-        function closeNav() {
-            document.getElementById("sideNav").style.width = "0";
-            document.getElementById("main").style.marginLeft= "0";
-        }
+            function closeNav() {
+                document.getElementById("sideNav").style.width = "0";
+                document.getElementById("main").style.marginLeft= "0";
+            }
+            
+        $(document).ready(function() {
+            $('#clinicForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '/search',
+                    data: formData,
+                    success: function(response) {
+                        var clinics = response.clinics;
+                        var resultsHtml = '<h2>Available Clinics</h2><ul>';
+                        if (clinics.length > 0) {
+                            for (var i = 0; i < clinics.length; i++) {
+                                resultsHtml += '<li>' + clinics[i] + '</li>';
+                            }
+                        } else {
+                            resultsHtml += '<li>No clinics available for your visit.</li>';
+                        }
+                        resultsHtml += '</ul>';
+                        $('#results').html(resultsHtml);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
