@@ -275,3 +275,15 @@ input[type=submit]:hover {
 .update_acct {
     display: none;
 }
+
+.create_pt {
+    display: none;
+}
+
+.create_appt {
+    display: none;
+}
+
+.create_medrec {
+    display: none;
+}
