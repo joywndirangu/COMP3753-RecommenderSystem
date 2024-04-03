@@ -4,22 +4,22 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Medlocator Administration</title>
-        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="https://localhost:4443/main.css">
         <!-- need to change the css sheet to have it to work -->
     </head>
     <body>
         <header>
-                <img src="RSLogo.png" alt="AcadiaPG">
+                <img src="https://localhost:4443/RSLogo.png" alt="AcadiaPG">
         </header>
         <div class="navbar">
             <span id="open-btn" onclick="openNav()">☰</span>
-            <a href="Home.html" class="right">Sign Out</a>
+            <a href="https://localhost:4443/home.html" class="right">Sign Out</a>
         </div>
         <div id="sideNav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-            <a href="patientDB.html">Record Management</a>
-            <a href="index.html">Site Finder</a>
-            <a href="contactForm.html">Contact Us</a>
+            <a href="https://localhost:4443/patientDB.html">Patients</a>
+            <a href="https://localhost:4443/map.html">Site Finder</a>
+            <a href="https://localhost:4443/contactForm.html">Contact Us</a>
         </div>
         <main>
             <h1>MedLocator Management System</h1>
@@ -156,52 +156,9 @@
                     </div>
                 </div>
             </form>
-        </main>        
-        <footer>
-            <div class="footer">
-                <h4>MEDLOCATOR</h4>
-            </div>
-            <div id = "copyright">
-                <p>Copyright &copy; 2024 DBMS</p>
-            </div>
-        </footer>
-        <script>
-
-            function openNav() {
-                document.getElementById("sideNav").style.width = "250px";
-                document.getElementById("main").style.marginLeft = "250px";
-            }
-        
-            function closeNav() {
-                document.getElementById("sideNav").style.width = "0";
-                document.getElementById("main").style.marginLeft= "0";
-            }
-
-            function toggleForms(formIdToShow) {
-                const forms = document.querySelectorAll('form');
-                forms.forEach(form => {
-                    if (form.id === formIdToShow) {
-                        form.style.display = 'block';
-                    } else {
-                        form.style.display = 'none';
-                    }
-                });
-            }
-
-            
-            function redirectToAppt() {
-                window.location.href = 'appt_rec.html';
-            }
-
-            function redirectToPatients() {
-                window.location.href = 'patient_rec.html';
-            }
-
-            function redirectToMedRec() {
-                window.location.href = 'med_rec.html';
-            }
-
+            <script>
             async function req(type, act, data) {
+
                 try {
 
                     const response = await fetch('https://localhost:4443/', {
@@ -240,17 +197,17 @@
                 catch (error) {
                     console.error('There was a problem with your fetch operation:', error);
                 }
-                }
+            }
 
-                function make_list(ulElement, item) {
+            function make_list(ulElement, item) {
                 let liElement = document.createElement("li");
                 liElement.textContent = item;
                 liElement.style.display = "inline-block";
                 liElement.style.marginRight = "10px";
                 ulElement.appendChild(liElement);
-                }
+            }
 
-                req('retrieve', 'admin', null).then(admin => {
+            req('retrieve', 'admin', null).then(admin => {
 
                 document.getElementById('clinic_id').value = admin[1]
                 document.getElementById('admin_role').value = admin[2]
@@ -328,7 +285,7 @@
                     }
 
                     for (let i = 0; i < pnts.length; i++) {
-
+                
                         req('retrieve', 'medical_record', [pnts[i]]).then(records => {
 
                             records.forEach(function(record_items) {
@@ -364,9 +321,9 @@
 
                     console.error('failed to parse patient list: ', error);
                 }
-                });
-
-                function update_admin() {
+            });
+    
+            function update_admin() {
                 req('retrieve', 'admin', null).then(admin => {
                     console.log(req('update', 'admin', [
                         parseInt(document.getElementById('clinic_id').value),
@@ -376,11 +333,13 @@
                         document.getElementById('admin_password').value,
                         admin[6],
                         admin[0]
-                    ]));
+                    ]).then(function(){
+                        location.reload(true);
+                    }));
                 });
-                }
-
-                function create_patient() {
+            }
+    
+            function create_patient() {
                 console.log(req('create', 'patient', [
                     document.getElementById('patient_name').value,
                     document.getElementById('patient_sex').value,
@@ -388,27 +347,54 @@
                     document.getElementById('emerg_contact').value,
                     parseInt(document.getElementById('healthcard_no').value),
                     document.getElementById('patient_address').value
-                ]));
-                }
+                ]).then(function(){
+                    location.reload(true);
+                }));
+            }
 
-                function create_appointment() {
+            function create_appointment() {
                 console.log(req('create', 'appointment', [
                     parseInt(document.getElementById('appointment_patient_id').value),
                     document.getElementById('appointment_type').value,
                     document.getElementById('appointment_status').value,
                     document.getElementById('appointment_datetime').value
-                ]));
-                }
+                ]).then(function(){
+                    location.reload(true);
+                }));
+            }
 
-                function create_medical_record() {
+            function create_medical_record() {
                 console.log(req('create', 'medical_record', [
                     parseInt(document.getElementById('record_patient_id').value),
                     document.getElementById('diagnoses').value,
                     document.getElementById('med_hist').value,
                     document.getElementById('medication').value
-                ]));
-                }
-
+                ]).then(function(){
+                    location.reload(true);
+                }));
+            }
         </script>
+    </main>        
+    <footer>
+        <div class="footer">
+            <h4>MEDLOCATOR</h4>
+        </div>
+        <div id = "copyright">
+            <p>Copyright &copy; 2024 DBMS</p>
+        </div>
+    </footer>
+    <script>
+
+        function openNav() {
+            document.getElementById("sideNav").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+    
+        function closeNav() {
+            document.getElementById("sideNav").style.width = "0";
+            document.getElementById("main").style.marginLeft= "0";
+        }
+
+    </script>
     </body>
 </html>
