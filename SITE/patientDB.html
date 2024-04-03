@@ -395,6 +395,30 @@
             document.getElementById("main").style.marginLeft= "0";
         }
 
+        function toggleForms(formIdToShow) {
+                const forms = document.querySelectorAll('form');
+                forms.forEach(form => {
+                    if (form.id === formIdToShow) {
+                        form.style.display = 'block';
+                    } else {
+                        form.style.display = 'none';
+                    }
+                });
+            }
+
+            
+            function redirectToAppt() {
+                window.location.href = 'appt_rec.html';
+            }
+
+            function redirectToPatients() {
+                window.location.href = 'patient_rec.html';
+            }
+
+            function redirectToMedRec() {
+                window.location.href = 'med_rec.html';
+            }
+
     </script>
     </body>
 </html>
