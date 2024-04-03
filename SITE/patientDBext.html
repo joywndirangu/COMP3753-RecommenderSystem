@@ -45,16 +45,15 @@
                             <label for="clinicID"><b>Clinic ID</b></label>
                             <input type="number" id="clinic_id" placeholder="Clinic ID" required>
                             <label for="role"><b>Role</b></label>
-                            <select id="admin_role" name="admin_role" required>
-                                <option value="health_prof">Healthcare Professional</option>
-                                <option value="admin">Administrator</option>
-                            </select>
+                            <input type="text" id="admin_role" placeholder="Role" required>
                             <label for="name"><b>Name</b></label>
                             <input type="text" id="admin_name" placeholder="Name" required>
                             <label for="email"><b>Email</b></label>
                             <input type="text" id="admin_email" placeholder="Email" required>
-                            <label for="pass"><b>Password</b></label>
-                            <input type="password" id="admin_password" placeholder="Password" required>
+                            <label for="old_pass"><b>Old Password</b></label>
+                            <input type="password" id="admin_old_password" placeholder="Password" required>
+                            <label for="new_pass"><b>New Password</b></label>
+                            <input type="password" id="admin_new_password" placeholder="Password" required>
                             <button onclick="update_admin()" class="btn">Update Admin</button>
                         </section>
                     </div>
@@ -77,7 +76,13 @@
                                 <input type="number" id="patient_age" placeholder="Age" name="age" required>
                                 <label for="address"><b>Patient Address</b></label>
                                 <input type="text" id="patient_address" placeholder="Address" name="address" required>
-                                <label for="emg_contact"><b>Emergency Contact Details</b></label>
+                                <label for="emg_contact"><b>Emergency Contact Details:</b></label>
+                                <br><br>
+                                <label for="emg_contact"><b>Name</b></label>
+                                <input type="text" id="emerg_contact" placeholder="Emergency Contact" name="emg_contact" required>
+                                <label for="emg_contact"><b>Phone Number</b></label>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                                <label for="emg_contact"><b>Relationship</b></label>
                                 <input type="text" id="emerg_contact" placeholder="Emergency Contact" name="emg_contact" required>
                                 <button onclick="create_patient()" class="btn">Create Patient</button>
                             </section>
@@ -139,12 +144,49 @@
                                 <label for="patient_id"><b>Patient ID</b></label>
                                 <input type="number" id="record_patient_id" placeholder="Patient ID" name="patient_id" required>
                                 <br><br>
-                                <label for="diagnoses"><b>Diagnoses</b></label>
-                                <textarea id="diagnoses" placeholder="Diagnoses" name="diagnoses"></textarea>
-                                <label for="med_hist"><b>Medical History</b></label>
+                                <label for="diagnoses"><b>Diagnoses:</b></label>
+                                <br><br>
+                                <label for="diagnosis"><b>Diagnosis</b></label>
+                                <input type="text" id="diagnosis" placeholder="Diagnosis" name="diagnosis" required>
+                                <label for="diagnosis_date"><b>Date of Diagnosis</b></label>
+                                <br><br>
+                                <input type="date" id="diagnosis_date" name="diagnosis_date" required>
+                                <br><br>
+                                <label for="result"><b>Result</b></label>
+                                <select id="appointment_status" name="appt_status" required>
+                                    <option value="positive">Positive</option>
+                                    <option value="negative">Negative</option>
+                                    <option value="abnormal">Abnormal</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="resukts_pending">Results Pending</option>
+                                </select>
+                                <label for="add_info"><b>Additional Information</b></label>
+                                <textarea id="add_info" placeholder="Additional Information" name="add_info"></textarea>
+                                <label for="med_hist"><b>Medical History:</b></label>
+                                <br><br>
+                                <label for="treatments"><b>Treatments</b></label>
+                                <textarea id="treatments" placeholder="Treatments" name="treatments"></textarea>
+                                <label for="surgeries"><b>Surgeries</b></label>
+                                <textarea id="surgeries" placeholder="Surgeries" name="surgeries"></textarea>
+                                <label for="allergies"><b>Allergies</b></label>
+                                <textarea id="allergies" placeholder="Allergies" name="allergies"></textarea>
+                                <label for="med_cond"><b>Medical Conditions</b></label>
+                                <textarea id="med_cond" placeholder="Medical Conditions" name="med_cond"></textarea>
+                                <label for="med_hist"><b>Medical History:</b></label>
                                 <textarea id="med_hist" placeholder="Medical History" name="med_hist"></textarea>
                                 <label for="meds"><b>Medications:</b></label>
-                                <textarea id="medication" placeholder="Medication" name="meds"></textarea>
+                                <!-- <textarea id="medication" placeholder="Medication" name="meds"></textarea> -->
+                                <br><br>
+                                <label for="med_id"><b>Medication ID</b></label>
+                                <input type="text" id="med_id" placeholder="Medication ID" name="med_id" required>
+                                <label for="med_name"><b>Name</b></label>
+                                <input type="text" id="emerg_contact" placeholder="Emergency Contact" name="emg_contact" required>
+                                <label for="dosage"><b>Dosage</b></label>
+                                <input type="number" id="dosage" name="dosage" placeholder="Dosage (in mg/ml)" required>
+                                <label for="frequency"><b>Frequency</b></label>
+                                <input type="number" id="frequency" name="frequency" placeholder="Frequency (per day)" required>
+                                <label for="duration"><b>Duration</b></label>
+                                <input type="number" id="duration" name="duration" placeholder="Duration (in days)" required>
                                 <button onclick="create_medical_record()" class="btn">Create Medical Record</button>
                             </section>
                         </div>
@@ -374,6 +416,8 @@
                         document.getElementById('admin_name').value,
                         document.getElementById('admin_email').value,
                         document.getElementById('admin_password').value,
+                        // document.getElementById('admin_old_password').value,
+                        // document.getElementById('admin_new_password').value,
                         admin[6],
                         admin[0]
                     ]));
