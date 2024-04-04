@@ -18,7 +18,7 @@
         <div id="sideNav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
             <a href="patientDB.html">Record Management</a>
-            <a href="index.html">Site Finder</a>
+            <a href="Map.html">Site Finder</a>
             <a href="contactForm.html">Contact Us</a>
         </div>
         <main>
@@ -36,9 +36,9 @@
                         <button id="record_btn" class="btn" onclick="toggleForms('create_medrec')">Medical Records</button>
                     </div>
                 </div>
-            <form id="update_acct" class="update_acct">
                 <div class="container1">
                     <div class="container2">
+                        <form id="update_acct" class="update_acct">
                         <section id="update_admin">
                             <h2>Your Account</h2>
                             <p>Update your account below:</p>
@@ -56,12 +56,12 @@
                             <input type="password" id="admin_new_password" placeholder="Password" required>
                             <button onclick="update_admin()" class="btn">Update Admin</button>
                         </section>
-                    </div>
-                </div>
-            </form>
+                    </form>
+                    <!-- </div>
+                </div> -->
             <form id="create_pt" class="create_pt">
-                <div class="container1">
-                    <div class="container2">
+                <!-- <div class="container1">
+                    <div class="container2"> -->
                         <div class="container">
                             <section id="create_patient">
                                 <h2>Create Patient</h2>
@@ -86,19 +86,19 @@
                                 <input type="text" id="emerg_contact" placeholder="Emergency Contact" name="emg_contact" required>
                                 <button onclick="create_patient()" class="btn">Create Patient</button>
                             </section>
+                            <section id="patients_section">
+                                <h2>Patients</h2>
+                                <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                                </div>
+                            </section>
                         </div>
-                        <section id="patients_section">
-                            <h2>Patients</h2>
-                            <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
-                    </div>
-                </div>
+                    <!-- </div>
+                </div> -->
             </form>
 
             <form id="create_appt" class="create_appt">
-                <div class="container1">
-                    <div class="container2">
+                <!-- <div class="container1">
+                    <div class="container2"> -->
                         <div class="container">
                             <section id="create_appointment">
                                 <h2>Create Appointment</h2>
@@ -125,18 +125,18 @@
                                 <input type="datetime-local" id="appointment_datetime" name="appt_datetime" required>
                                 <button onclick="create_appointment()" class="btn">Create Appointment</button>
                             </section>
+                            <section id="appointments_section">
+                                <h2>Appointments</h2>
+                                <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                                </div>
+                            </section>
                         </div>
-                        <section id="appointments_section">
-                            <h2>Appointments</h2>
-                            <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
-                    </div>
-                </div>
+                    <!-- </div>
+                </div> -->
             </form>
             <form id="create_medrec" class="create_medrec">
-                <div class="container1">
-                    <div class="container2">
+                <!-- <div class="container1">
+                    <div class="container2"> -->
                         <div class="container">
                             <section id="create_medical_record">
                                 <h2>Create Medical Record</h2>
@@ -189,12 +189,12 @@
                                 <input type="number" id="duration" name="duration" placeholder="Duration (in days)" required>
                                 <button onclick="create_medical_record()" class="btn">Create Medical Record</button>
                             </section>
+                            <section id="medical_records_section">
+                                <h2>Medical Records</h2>
+                                <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                                </div>
+                            </section>
                         </div>
-                        <section id="medical_records_section">
-                            <h2>Medical Records</h2>
-                            <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                            </div>
-                        </section>
                     </div>
                 </div>
             </form>

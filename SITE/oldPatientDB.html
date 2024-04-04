@@ -4,77 +4,123 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Medlocator Administration</title>
-        <link rel="stylesheet" href="https://localhost:4443/main.css">
+        <link rel="stylesheet" href="main.css">
     </head>
     <body>
         <header>
-                <img src="https://localhost:4443/RSLogo.png" alt="AcadiaPG">
+                <img src="RSLogo.png" alt="AcadiaPG">
         </header>
         <div class="navbar">
             <span id="open-btn" onclick="openNav()">☰</span>
-            <a href="https://localhost:4443/home.html" class="right">Sign Out</a>
+            <a href="home.html" class="right">Sign Out</a>
         </div>
         <div id="sideNav" class="sidenav">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-            <a href="https://localhost:4443/patientDB.html">Patients</a>
-            <a href="https://localhost:4443/map.html">Site Finder</a>
-            <a href="https://localhost:4443/contactForm.html">Contact Us</a>
+            <a href="patientDB.html">Patients</a>
+            <a href="map.html">Site Finder</a>
+            <a href="contactForm.html">Contact Us</a>
         </div>
         <main>
             <h1>MedLocator Management System</h1>
-            <section id="update_admin">
-                <h2>Admin Account</h2>
-                <input type="number" id="clinic_id" placeholder="Clinic ID">
-                <input type="text" id="admin_role" placeholder="Role" >
-                <input type="text" id="admin_name" placeholder="Name" >
-                <input type="email" id="admin_email" placeholder="Email">
-                <input type="password" id="admin_password" placeholder="Password">
-                <button onclick="update_admin()">Update Admin</button>
-            </section>
-            <div style="display: flex; justify-content: space-around;">
-                <section id="create_patient" style="margin-right: 20px;">
-                    <h2>Create Patient</h2>
-                    <input type="text" id="patient_name" placeholder="Name">
-                    <input type="text" id="patient_sex" placeholder="Sex (M/F)">
-                    <input type="number" id="patient_age" placeholder="Age">
-                    <input type="text" id="emerg_contact" placeholder="Emergency Contact">
-                    <input type="number" id="healthcard_no" placeholder="Healthcard Number">
-                    <input type="text" id="patient_address" placeholder="Address">
-                    <button onclick="create_patient()">Create Patient</button>
-                </section>
-                <section id="create_appointment" style="margin-right: 20px;">
-                    <h2>Create Appointment</h2>
-                    <input type="number" id="appointment_patient_id" placeholder="Patient ID">
-                    <input type="text" id="appointment_type" placeholder="Appointment Type">
-                    <input type="text" id="appointment_status" placeholder="Appointment Status">
-                    <input type="text" id="appointment_datetime" placeholder="Appointment Date & Time">
-                    <button onclick="create_appointment()">Create Appointment</button>
-                </section>
-                <section id="create_medical_record">
-                    <h2>Create Medical Record</h2>
-                    <input type="number" id="record_patient_id" placeholder="Patient ID">
-                    <textarea id="diagnoses" placeholder="Diagnoses"></textarea>
-                    <textarea id="med_hist" placeholder="Medical History"></textarea>
-                    <textarea id="medication" placeholder="Medication"></textarea>
-                    <button onclick="create_medical_record()">Create Medical Record</button>
-                </section>
-            </div>                                 
-            <section id="patients_section">
-                <h2>Patients</h2>
-                <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+            <div class="container1">
+                <div class="container2">
+                    <h2>Options</h2>
+                    <p>To update your account:</p>
+                    <button id="account_btn" class="btn" onclick="toggleForms('update_acct')">Update Account</button>
+                    <p>To create, update, delete or view a patient record:</p>
+                    <button id="patient_btn" class="btn" onclick="toggleForms('create_pt')">Patient Records</button>
+                    <p>To create, update, delete or view a patient appointment:</p>
+                    <button id="appt_btn" class="btn" onclick="toggleForms('create_appt')">Appointments</button>
+                    <p>To create, update, delete or view a patient medical record:</p>
+                    <button id="record_btn" class="btn" onclick="toggleForms('create_medrec')">Medical Records</button>
                 </div>
-            </section>
-            <section id="appointments_section">
-                <h2>Appointments</h2>
-                <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+            </div>
+            <div class="container1">
+                <div class="container2">
+                    <form id="update_acct" class="update_acct">
+                        <section id="update_admin">
+                            <h2>Admin Account</h2>
+                            <input type="number" id="clinic_id" placeholder="Clinic ID">
+                            <input type="text" id="admin_role" placeholder="Role" >
+                            <input type="text" id="admin_name" placeholder="Name" >
+                            <input type="email" id="admin_email" placeholder="Email">
+                            <input type="password" id="admin_password" placeholder="Password">
+                            <button onclick="update_admin()">Update Admin</button>
+                        </section>
+                    </form>
+            <!-- <div style="display: flex; justify-content: space-around;"> -->
+                    <form id="create_pt" class="create_pt">
+                        <section id="create_patient">
+                            <h2>Create Patient</h2>
+                            <input type="text" id="patient_name" placeholder="Name">
+                            <input type="text" id="patient_sex" placeholder="Sex (M/F)">
+                            <input type="number" id="patient_age" placeholder="Age">
+                            <input type="text" id="emerg_contact" placeholder="Emergency Contact">
+                            <input type="number" id="healthcard_no" placeholder="Healthcard Number">
+                            <input type="text" id="patient_address" placeholder="Address">
+                            <button onclick="create_patient()">Create Patient</button>
+                        </section>
+                        <section id="patients_section">
+                            <h2>Patients</h2>
+                            <div id="patients_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                            </div>
+                        </section>
+                    </form>
+                
+                    <form id="create_appt" class="create_appt">
+                        <section id="create_appointment" style="margin-right: 20px;">
+                            <h2>Create Appointment</h2>
+                            <input type="number" id="appointment_patient_id" placeholder="Patient ID">
+                            <input type="text" id="appointment_type" placeholder="Appointment Type">
+                            <input type="text" id="appointment_status" placeholder="Appointment Status">
+                            <input type="text" id="appointment_datetime" placeholder="Appointment Date & Time">
+                            <button onclick="create_appointment()">Create Appointment</button>
+                        </section>
+                        <section id="appointments_section">
+                            <h2>Appointments</h2>
+                            <div id="appointments_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                            </div>
+                        </section>
+                    </form>
+
+                    <form id="create_medrec" class="create_medrec">
+                        <section id="create_medical_record">
+                            <h2>Create Medical Record</h2>
+                            <input type="number" id="record_patient_id" placeholder="Patient ID">
+                            <textarea id="diagnoses" placeholder="Diagnoses"></textarea>
+                            <textarea id="med_hist" placeholder="Medical History"></textarea>
+                            <textarea id="medication" placeholder="Medication"></textarea>
+                            <button onclick="create_medical_record()">Create Medical Record</button>
+                        </section>
+                        <section id="medical_records_section">
+                            <h2>Medical Records</h2>
+                            <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
+                            </div>
+                        </section>
+                    </form>
                 </div>
-            </section>
-            <section id="medical_records_section">
-                <h2>Medical Records</h2>
-                <div id="medical_records_container" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;">
-                </div>
-            </section>
+            </div>                               
             <script>
+                function openNav() {
+                    document.getElementById("sideNav").style.width = "250px";
+                    document.getElementById("main").style.marginLeft = "250px";
+                }
+            
+                function closeNav() {
+                    document.getElementById("sideNav").style.width = "0";
+                    document.getElementById("main").style.marginLeft= "0";
+                }
+
+                function toggleForms(formIdToShow) {
+                    const forms = document.querySelectorAll('form');
+                    forms.forEach(form => {
+                        if (form.id === formIdToShow) {
+                            form.style.display = 'block';
+                        } else {
+                            form.style.display = 'none';
+                        }
+                    });
+                }
                 async function req(type, act, data) {
 
                     try {
