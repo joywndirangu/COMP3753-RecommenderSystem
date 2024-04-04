@@ -52,7 +52,7 @@
                             <label for="name"><b>Name</b></label>
                             <input type="text" id="admin_name" placeholder="Name" required>
                             <label for="email"><b>Email</b></label>
-                            <input type="text" id="admin_email" placeholder="Email" required>
+                            <input type="email" id="admin_email" placeholder="Email" required>
                             <label for="pass"><b>Password</b></label>
                             <input type="password" id="admin_password" placeholder="Password" required>
                             <button onclick="update_admin()" class="btn">Update Admin</button>
@@ -117,7 +117,7 @@
                                 <!-- do a status update container -->
                                 <!-- <input type="text" id="appointment_status" placeholder="Appointment Status" name="appt_status" required> -->
                                 <label for="appt_datetime"><b>Date & Time</b></label>
-                                <input type="datetime-local" id="appointment_datetime" name="appt_datetime" required>
+                                <input type="text" id="appointment_datetime" name="appt_datetime" placeholder="YYYY-MM-DD hrs:mins:sec" required>
                                 <button onclick="create_appointment()" class="btn">Create Appointment</button>
                             </section>
                         </div>
