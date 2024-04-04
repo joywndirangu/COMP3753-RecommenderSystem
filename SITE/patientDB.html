@@ -45,10 +45,11 @@
                             <label for="clinicID"><b>Clinic ID</b></label>
                             <input type="number" id="clinic_id" placeholder="Clinic ID" required>
                             <label for="role"><b>Role</b></label>
-                            <select id="admin_role" name="admin_role" required>
+                            <input type="text" id="admin_role" placeholder="Role" required>
+                            <!-- <select id="admin_role" name="admin_role" required>
                                 <option value="health_prof">Healthcare Professional</option>
                                 <option value="admin">Administrator</option>
-                            </select>
+                            </select> -->
                             <label for="name"><b>Name</b></label>
                             <input type="text" id="admin_name" placeholder="Name" required>
                             <label for="email"><b>Email</b></label>
@@ -103,8 +104,8 @@
                                 <label for="appt_type"><b>Type</b></label>
                                 <input type="text" id="appointment_type" placeholder="Appointment Type" name="appt_type" required>
                                 <label for="appt_status"><b>Status</b></label>
-                                <br>
-                                <select id="appointment_status" name="appt_status" required>
+                                <input type="text" id="appointment_status" placeholder="Appointment Status" name="appt_status" required>
+                                <!-- <select id="appointment_status" name="appt_status" required>
                                     <option value="confirmed">Confirmed</option>
                                     <option value="cancelled">Cancelled</option>
                                     <option value="no_show">No Show</option>
@@ -113,7 +114,7 @@
                                     <option value="late">Late</option>
                                     <option value="in_progress">In Progress</option>
                                     <option value="waiting_list">On Waiting List</option>
-                                </select>
+                                </select> -->
                                 <!-- do a status update container -->
                                 <!-- <input type="text" id="appointment_status" placeholder="Appointment Status" name="appt_status" required> -->
                                 <label for="appt_datetime"><b>Date & Time</b></label>
